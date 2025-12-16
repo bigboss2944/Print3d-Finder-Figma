@@ -5,7 +5,12 @@
   import "./index.css";
 
   createRoot(document.getElementById("root")!).render(
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider 
+      attribute="class" 
+      defaultTheme="system" 
+      enableSystem
+      disableTransitionOnChange={false}
+    >
       <App />
     </ThemeProvider>
   );
