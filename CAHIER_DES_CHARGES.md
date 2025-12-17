@@ -431,7 +431,7 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
   - Suggestions et auto-complétion
 
 - **Recherche par image** :
-  - Azure Computer Vision ou Google Cloud Vision API
+  - Azure Computer Vision, Google Cloud Vision API ou Claude Anthropic 
   - Modèle ML personnalisé (TensorFlow/PyTorch) si budget permet
   - Extraction de features visuelles
   - Comparaison par similarité
@@ -907,7 +907,7 @@ Les messages d'erreur doivent être **suffisamment explicites** pour guider l'ut
 - ✅ Tests de pénétration
 - ✅ Rapport de conformité RGPD
 
-## 7. Planning et Jalons
+## 7. Planning et Jalons pour V1
 
 **Note importante** : Les durées indiquées sont en **semaines de travail effectives**. 
 Le développeur travaillant **en temps partiel** (~50% du temps), les durées calendaires réelles seront approximativement **doublées**.
@@ -918,6 +918,7 @@ Le développeur travaillant **en temps partiel** (~50% du temps), les durées ca
 - Design UI/UX (maquettes) avec images libres de droits
 - Architecture technique détaillée
 - Sélection des packages open-source maintenus
+- Vérification licences des packages
 - Configuration de l'environnement de développement
 
 ### Phase 2 : Développement Backend
@@ -950,7 +951,6 @@ Le développeur travaillant **en temps partiel** (~50% du temps), les durées ca
 - Tests de sécurité (HTTPS, authentification, logs)
 - Corrections de bugs
 - Optimisations
-- Vérification licences des packages
 
 ### Phase 5 : Déploiement et Lancement
 - **Durée** : 2 semaines effectives (≈ 4-5 semaines calendaires)
@@ -1128,13 +1128,13 @@ Le développeur travaillera **en temps partiel** sur ce projet, alternant avec d
 - Nouvelles fonctionnalités : planning trimestriel
 
 ### 11.3 Évolutions Futures Envisagées
-- **Phase 3** :
+- **V2** :
   - Upload de modèles 3D par les utilisateurs
   - Marketplace de modèles (créateurs tiers)
   - Communauté (partage, likes, commentaires)
   - Configurateur 3D avancé (personnalisation de modèles)
   
-- **Phase 4** :
+- **V3** :
   - **Analyse structurelle avancée des modèles 3D** (overhangs, supports, stabilité)
   - **Gestion complète des buses d'impression** avec sélection par l'utilisateur
   - Calcul précis durée/coût selon buse choisie (impact sur consommation plastique)
