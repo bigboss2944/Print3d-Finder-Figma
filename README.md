@@ -91,22 +91,24 @@ Le projet respecte des **standards de qualité stricts** :
 - 🔐 Inscription et connexion sécurisées
 - 🔍 Recherche textuelle avec auto-complétion
 - 📷 Recherche par photo (upload ou capture)
-- 🖼️ Visualisation de modèles avec images multiples (Version 1)
+- 🖼️ Visualisation de modèles avec images multiples + **auteur/créateur affiché** (Version 1)
 - 🎨 Visualisation 3D interactive (Version 2 - future)
-- 📊 Analyse automatique de printabilité
-- ⚙️ Configuration personnalisée (matériau, couleur, qualité)
+- 📊 Analyse automatique de printabilité (base : dimensions, matériaux, coûts)
+- ⚙️ Configuration personnalisée (matériau, couleur, **buse**, qualité)
 - 🛒 Commande et suivi d'impression
 - 📧 Notifications email
 - ✅ Messages d'erreur clairs et explicites
 - 📜 Historique des commandes
 - ⭐ Évaluation et avis
+- 🚀 **Base de données optimisée pour millions de modèles** (latence <50ms)
 
 ### Pour les Administrateurs / Imprimeur
 - 📊 Tableau de bord avec statistiques
 - **📧 Notification email automatique** pour chaque nouvelle commande reçue
 - 📦 Gestion des commandes en temps réel
-- 🎨 Gestion des modèles 3D
+- 🎨 Gestion des modèles 3D avec informations auteur/source
 - 🧱 **Gestion des matériaux** (ajout, modification, prix, couleurs, stock)
+- 🔧 **Gestion des buses d'impression** (diamètres, qualités, compatibilités)
 - 🌐 **Gestion des sources de modèles** (configuration des sites web interrogés)
 - 🔄 Monitoring des synchronisations et performance des sources
 - 👥 Gestion des utilisateurs
@@ -150,6 +152,15 @@ Le projet respecte des **standards de qualité stricts** :
 - Notifications push
 - Synchronisation avec backend
 
+### 🔬 Phase 6 : Analyse Structurelle Avancée (Future)
+**Après mise en production Phase 1-5**
+- Analyse structurelle complète des modèles 3D
+- Détection automatique des surfaces non supportées
+- Calcul de stabilité structurelle
+- Identification des zones nécessitant des supports
+- Vérification épaisseur des parois
+- Simulation de slicing avancée
+
 ## 👨‍💻 Contexte de Développement
 
 Ce projet est développé par un **développeur solo en temps partiel**, avec une approche progressive :
@@ -158,19 +169,6 @@ Ce projet est développé par un **développeur solo en temps partiel**, avec un
 3. **Packages** : Uniquement open-source et maintenus activement
 4. **Images** : Libres de droits (Unsplash, Pexels, Pixabay)
 5. **Ensuite** : Application mobile une fois le web stabilisé
-- Intégration caméra pour recherche photo
-- Notifications push
-- Synchronisation avec backend
-
-### 🤖 Phase 4 : Intelligence Artificielle
-- Recherche par image avancée
-- Analyse automatique de modèles 3D
-- Recommandations personnalisées
-
-### 🌟 Phase 5 : Fonctionnalités Avancées
-- Upload de modèles par utilisateurs
-- Marketplace de modèles
-- Configurateur 3D avancé
 - Réalité Augmentée (AR)
 
 ## 💻 Développement Local (Prototype React Actuel)

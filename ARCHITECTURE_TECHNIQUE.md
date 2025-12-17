@@ -1056,6 +1056,253 @@ public enum SourceStatus
     Syncing
 }
 ```
+
+#### 2.2.6 Controller Administrateur - Gestion des Buses
+
+```csharp
+[ApiController]
+[Route("api/admin/[controller]")]
+[Authorize(Roles = "Admin,SuperAdmin")]
+public class NozzlesController : ControllerBase
+{
+    private readonly INozzleService _nozzleService;
+    private readonly ILogger<NozzlesController> _logger;
+
+    public NozzlesController(
+        INozzleService nozzleService,
+        ILogger<NozzlesController> logger)
+    {
+        _nozzleService = nozzleService;
+        _logger = logger;
+    }
+
+    /// <summary>
+    /// Récupère la liste de toutes les buses
+    /// </summary>
+    [HttpGet]
+    public async Task<ActionResult<List<NozzleDto>>> GetAll(
+        [FromQuery] bool includeInactive = false)
+    {
+        try
+        {
+            var nozzles = await _nozzleService.GetAllAsync(includeInactive);
+            return Ok(nozzles);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving nozzles");
+            return StatusCode(500, "Erreur lors de la récupération des buses");
+        }
+    }
+
+    /// <summary>
+    /// Récupère une buse par son ID
+    /// </summary>
+    [HttpGet("{id}")]
+    public async Task<ActionResult<NozzleDto>> GetById(Guid id)
+    {
+        try
+        {
+            var nozzle = await _nozzleService.GetByIdAsync(id);
+            if (nozzle == null)
+                return NotFound($"Buse {id} introuvable");
+
+            return Ok(nozzle);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving nozzle {NozzleId}", id);
+            return StatusCode(500, "Erreur lors de la récupération de la buse");
+        }
+    }
+
+    /// <summary>
+    /// Crée une nouvelle buse
+    /// </summary>
+    [HttpPost]
+    public async Task<ActionResult<NozzleDto>> Create(
+        [FromBody] CreateNozzleRequest request)
+    {
+        try
+        {
+            var nozzle = await _nozzleService.CreateAsync(request);
+            
+            _logger.LogInformation(
+                "Nozzle {NozzleName} ({Diameter}mm) created by {UserId}",
+                nozzle.Name,
+                nozzle.Diameter,
+                User.FindFirst("sub")?.Value);
+
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = nozzle.Id },
+                nozzle);
+        }
+        catch (ValidationException ex)
+        {
+            return BadRequest(new { message = ex.Message, errors = ex.Errors });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating nozzle");
+            return StatusCode(500, "Erreur lors de la création de la buse");
+        }
+    }
+
+    /// <summary>
+    /// Met à jour une buse existante
+    /// </summary>
+    [HttpPut("{id}")]
+    public async Task<ActionResult<NozzleDto>> Update(
+        Guid id,
+        [FromBody] UpdateNozzleRequest request)
+    {
+        try
+        {
+            var nozzle = await _nozzleService.UpdateAsync(id, request);
+            if (nozzle == null)
+                return NotFound($"Buse {id} introuvable");
+
+            _logger.LogInformation(
+                "Nozzle {NozzleId} updated by {UserId}",
+                id,
+                User.FindFirst("sub")?.Value);
+
+            return Ok(nozzle);
+        }
+        catch (ValidationException ex)
+        {
+            return BadRequest(new { message = ex.Message, errors = ex.Errors });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating nozzle {NozzleId}", id);
+            return StatusCode(500, "Erreur lors de la mise à jour de la buse");
+        }
+    }
+
+    /// <summary>
+    /// Supprime (archive) une buse
+    /// </summary>
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(Guid id)
+    {
+        try
+        {
+            var result = await _nozzleService.DeleteAsync(id);
+            if (!result)
+                return NotFound($"Buse {id} introuvable");
+
+            _logger.LogInformation(
+                "Nozzle {NozzleId} deleted by {UserId}",
+                id,
+                User.FindFirst("sub")?.Value);
+
+            return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting nozzle {NozzleId}", id);
+            return StatusCode(500, "Erreur lors de la suppression de la buse");
+        }
+    }
+
+    /// <summary>
+    /// Active ou désactive une buse
+    /// </summary>
+    [HttpPatch("{id}/toggle-status")]
+    public async Task<ActionResult> ToggleStatus(Guid id)
+    {
+        try
+        {
+            var result = await _nozzleService.ToggleStatusAsync(id);
+            if (!result)
+                return NotFound($"Buse {id} introuvable");
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error toggling nozzle status {NozzleId}", id);
+            return StatusCode(500, "Erreur lors du changement de statut");
+        }
+    }
+
+    /// <summary>
+    /// Récupère les buses compatibles avec un matériau et une qualité
+    /// </summary>
+    [HttpGet("compatible")]
+    public async Task<ActionResult<List<NozzleDto>>> GetCompatibleNozzles(
+        [FromQuery] string materialType,
+        [FromQuery] PrintQuality quality)
+    {
+        try
+        {
+            var nozzles = await _nozzleService.GetCompatibleNozzlesAsync(materialType, quality);
+            return Ok(nozzles);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving compatible nozzles");
+            return StatusCode(500, "Erreur lors de la récupération des buses compatibles");
+        }
+    }
+}
+
+// DTOs pour les buses
+public class NozzleDto
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+    public double Diameter { get; set; }
+    public string Material { get; set; }
+    public string Description { get; set; }
+    public bool IsActive { get; set; }
+    public double MinLayerHeight { get; set; }
+    public double MaxLayerHeight { get; set; }
+    public int RecommendedSpeed { get; set; }
+    public bool SupportsAbrasiveMaterials { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+}
+
+public class CreateNozzleRequest
+{
+    [Required(ErrorMessage = "Le nom de la buse est obligatoire")]
+    [MaxLength(50)]
+    public string Name { get; set; }
+
+    [Required]
+    [Range(0.1, 2.0, ErrorMessage = "Le diamètre doit être entre 0.1 et 2.0 mm")]
+    public double Diameter { get; set; }
+
+    [MaxLength(50)]
+    public string Material { get; set; } = "Laiton";
+
+    [MaxLength(500)]
+    public string Description { get; set; }
+
+    [Range(0.05, 1.0, ErrorMessage = "La hauteur de couche minimale doit être entre 0.05 et 1.0 mm")]
+    public double MinLayerHeight { get; set; }
+
+    [Range(0.05, 1.0, ErrorMessage = "La hauteur de couche maximale doit être entre 0.05 et 1.0 mm")]
+    public double MaxLayerHeight { get; set; }
+
+    [Range(10, 200, ErrorMessage = "La vitesse doit être entre 10 et 200 mm/s")]
+    public int RecommendedSpeed { get; set; } = 60;
+
+    public bool SupportsAbrasiveMaterials { get; set; } = false;
+}
+
+public class UpdateNozzleRequest : CreateNozzleRequest
+{
+    public bool? IsActive { get; set; }
+}
+```
 ```
 
 ### 2.3 Couche Données
@@ -1094,6 +1341,16 @@ public class Model3D
     public string Description { get; set; }
     
     [Required]
+    [MaxLength(200)]
+    public string Author { get; set; } // Auteur/Créateur du modèle
+    
+    [MaxLength(500)]
+    public string SourceUrl { get; set; } // URL source du modèle
+    
+    [MaxLength(100)]
+    public string License { get; set; } // Type de licence (CC BY, CC BY-SA, etc.)
+    
+    [Required]
     public string FileUrl { get; set; } // URL dans Azure Blob/S3
     
     public string ThumbnailUrl { get; set; }
@@ -1114,6 +1371,9 @@ public class Model3D
     // Relations
     public Guid CategoryId { get; set; }
     public virtual Category Category { get; set; }
+    
+    public Guid? SourceId { get; set; } // Source externe (Thingiverse, etc.)
+    public virtual ModelSource Source { get; set; }
     
     public virtual ICollection<ModelMaterial> CompatibleMaterials { get; set; }
     public virtual ICollection<Order> Orders { get; set; }
@@ -1139,6 +1399,9 @@ public class Order
     // Configuration d'impression
     public Guid MaterialId { get; set; }
     public virtual Material Material { get; set; }
+    
+    public Guid NozzleId { get; set; } // Référence vers la buse utilisée
+    public virtual Nozzle Nozzle { get; set; }
     
     public string Color { get; set; }
     public PrintQuality Quality { get; set; } // Draft, Standard, HighQuality
@@ -1214,6 +1477,42 @@ public class Material
     public virtual ICollection<ModelMaterial> CompatibleModels { get; set; }
     public virtual ICollection<Order> Orders { get; set; }
 }
+
+// Entité Nozzle (Buse d'impression)
+public class Nozzle
+{
+    [Key]
+    public Guid Id { get; set; }
+    
+    [Required]
+    [MaxLength(50)]
+    public string Name { get; set; } // Ex: "Buse 0.4mm Standard", "Buse 0.2mm Haute Précision"
+    
+    [Required]
+    public double Diameter { get; set; } // Diamètre en mm (0.2, 0.4, 0.6, 0.8, 1.0, etc.)
+    
+    [MaxLength(50)]
+    public string Material { get; set; } // Laiton, Acier trempé, Ruby tip, etc.
+    
+    [MaxLength(500)]
+    public string Description { get; set; }
+    
+    public bool IsActive { get; set; } // Disponible ou non
+    
+    // Qualités d'impression compatibles avec cette buse
+    public double MinLayerHeight { get; set; } // Hauteur de couche minimale en mm
+    public double MaxLayerHeight { get; set; } // Hauteur de couche maximale en mm
+    
+    public int RecommendedSpeed { get; set; } // Vitesse recommandée en mm/s
+    
+    // Compatibilité matériaux
+    public bool SupportsAbrasiveMaterials { get; set; } // Matériaux abrasifs (carbone, métallique)
+    
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+    
+    public virtual ICollection<Order> Orders { get; set; }
+}
 ```
 
 #### 2.3.2 DbContext Configuration
@@ -1230,6 +1529,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
     public DbSet<Order> Orders { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Material> Materials { get; set; }
+    public DbSet<Nozzle> Nozzles { get; set; }
     public DbSet<Review> Reviews { get; set; }
     public DbSet<Favorite> Favorites { get; set; }
 
@@ -1247,9 +1547,22 @@ public class ApplicationDbContext : IdentityDbContext<User>
         // Configuration Model3D
         modelBuilder.Entity<Model3D>(entity =>
         {
+            // Index pour recherche rapide (millions de modèles)
             entity.HasIndex(e => e.Name);
+            entity.HasIndex(e => e.Author); // Recherche par auteur
             entity.HasIndex(e => e.CategoryId);
+            entity.HasIndex(e => e.SourceId); // Filtrage par source
+            entity.HasIndex(e => e.CreatedAt);
+            entity.HasIndex(e => new { e.AverageRating, e.Downloads }); // Tri par popularité
+            
+            // Index de recherche textuelle (PostgreSQL full-text search)
+            entity.HasIndex(e => new { e.Name, e.Description, e.Author })
+                .HasMethod("GIN") // Generalized Inverted Index pour PostgreSQL
+                .HasAnnotation("PostgreSQL:IndexMethod", "gin")
+                .HasAnnotation("PostgreSQL:IndexOperator", "gin_trgm_ops");
+            
             entity.Property(e => e.AverageRating).HasPrecision(3, 2);
+            entity.Property(e => e.Author).IsRequired();
         });
 
         // Configuration Order
@@ -1270,6 +1583,15 @@ public class ApplicationDbContext : IdentityDbContext<User>
         modelBuilder.Entity<Material>(entity =>
         {
             entity.Property(e => e.PricePerGram).HasPrecision(10, 4);
+        });
+
+        // Configuration Nozzle
+        modelBuilder.Entity<Nozzle>(entity =>
+        {
+            entity.HasIndex(e => e.Diameter);
+            entity.HasIndex(e => e.IsActive);
+            entity.Property(e => e.Name).IsRequired();
+            entity.Property(e => e.Diameter).IsRequired();
         });
 
         // Seed des données initiales
@@ -1296,9 +1618,279 @@ public class ApplicationDbContext : IdentityDbContext<User>
             new Material { Id = Guid.NewGuid(), Name = "TPU", Description = "Flexible, élastique", PricePerGram = 0.050m, IsAvailable = true },
             new Material { Id = Guid.NewGuid(), Name = "Résine", Description = "Haute précision, détails fins", PricePerGram = 0.080m, IsAvailable = true }
         );
+
+        // Buses (Nozzles)
+        modelBuilder.Entity<Nozzle>().HasData(
+            new Nozzle { 
+                Id = Guid.NewGuid(), 
+                Name = "Buse 0.2mm Haute Précision", 
+                Diameter = 0.2, 
+                Material = "Laiton", 
+                Description = "Pour détails fins et haute résolution",
+                MinLayerHeight = 0.05,
+                MaxLayerHeight = 0.15,
+                RecommendedSpeed = 40,
+                SupportsAbrasiveMaterials = false,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new Nozzle { 
+                Id = Guid.NewGuid(), 
+                Name = "Buse 0.4mm Standard", 
+                Diameter = 0.4, 
+                Material = "Laiton", 
+                Description = "Buse polyvalente, usage général",
+                MinLayerHeight = 0.1,
+                MaxLayerHeight = 0.3,
+                RecommendedSpeed = 60,
+                SupportsAbrasiveMaterials = false,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new Nozzle { 
+                Id = Guid.NewGuid(), 
+                Name = "Buse 0.6mm Rapide", 
+                Diameter = 0.6, 
+                Material = "Laiton", 
+                Description = "Pour impressions rapides et objets volumineux",
+                MinLayerHeight = 0.2,
+                MaxLayerHeight = 0.4,
+                RecommendedSpeed = 80,
+                SupportsAbrasiveMaterials = false,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new Nozzle { 
+                Id = Guid.NewGuid(), 
+                Name = "Buse 0.4mm Acier Trempé", 
+                Diameter = 0.4, 
+                Material = "Acier trempé", 
+                Description = "Pour matériaux abrasifs (carbone, métal)",
+                MinLayerHeight = 0.1,
+                MaxLayerHeight = 0.3,
+                RecommendedSpeed = 50,
+                SupportsAbrasiveMaterials = true,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new Nozzle { 
+                Id = Guid.NewGuid(), 
+                Name = "Buse 0.8mm Très Rapide", 
+                Diameter = 0.8, 
+                Material = "Laiton", 
+                Description = "Pour prototypes et grands volumes",
+                MinLayerHeight = 0.3,
+                MaxLayerHeight = 0.6,
+                RecommendedSpeed = 100,
+                SupportsAbrasiveMaterials = false,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            }
+        );
     }
 }
 ```
+
+#### 2.3.3 Optimisation de la Base de Données pour Millions de Modèles
+
+**Stratégie de Performance et Scalabilité**
+
+La base de données doit être capable de gérer efficacement **plusieurs millions de modèles 3D** avec une latence minimale. Voici les optimisations implémentées :
+
+**1. Indexation Avancée (PostgreSQL)**
+
+```csharp
+// Extension pg_trgm pour recherche textuelle rapide
+modelBuilder.HasPostgresExtension("pg_trgm");
+modelBuilder.HasPostgresExtension("btree_gin");
+
+// Configuration Model3D avec index optimisés
+modelBuilder.Entity<Model3D>(entity =>
+{
+    // Index B-tree pour recherches exactes et tri
+    entity.HasIndex(e => e.Name);
+    entity.HasIndex(e => e.Author);
+    entity.HasIndex(e => e.CategoryId);
+    entity.HasIndex(e => e.CreatedAt);
+    
+    // Index composite pour tri par popularité (ORDER BY rating DESC, downloads DESC)
+    entity.HasIndex(e => new { e.AverageRating, e.Downloads })
+        .IsDescending(true, true);
+    
+    // Index GIN pour recherche textuelle full-text (pg_trgm)
+    entity.HasIndex(e => new { e.Name, e.Description, e.Author })
+        .HasMethod("GIN")
+        .HasAnnotation("PostgreSQL:IndexOperator", "gin_trgm_ops");
+    
+    // Index partiel pour modèles actifs uniquement
+    entity.HasIndex(e => e.IsActive)
+        .HasFilter("is_active = true");
+});
+```
+
+**2. Partitionnement des Tables (pour >10M records)**
+
+```sql
+-- Partitionnement par année de création
+CREATE TABLE models_2024 PARTITION OF models
+    FOR VALUES FROM ('2024-01-01') TO ('2025-01-01');
+
+CREATE TABLE models_2025 PARTITION OF models
+    FOR VALUES FROM ('2025-01-01') TO ('2026-01-01');
+```
+
+**3. Mise en Cache (Redis)**
+
+```csharp
+public class CachedModel3DService : IModel3DService
+{
+    private readonly IDistributedCache _cache;
+    private readonly IModel3DService _innerService;
+    private const int CacheDurationMinutes = 60;
+
+    public async Task<List<Model3DDto>> GetPopularModelsAsync()
+    {
+        var cacheKey = "popular_models";
+        var cached = await _cache.GetStringAsync(cacheKey);
+        
+        if (cached != null)
+            return JsonSerializer.Deserialize<List<Model3DDto>>(cached);
+
+        var models = await _innerService.GetPopularModelsAsync();
+        
+        await _cache.SetStringAsync(
+            cacheKey,
+            JsonSerializer.Serialize(models),
+            new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(CacheDurationMinutes)
+            });
+
+        return models;
+    }
+}
+```
+
+**4. Pagination Optimisée (Cursor-based)**
+
+```csharp
+// Éviter OFFSET pour grandes tables (lent sur millions de rows)
+// Utiliser cursor-based pagination
+public async Task<PagedResult<Model3DDto>> SearchAsync(
+    string query,
+    Guid? cursorId = null,
+    int pageSize = 20)
+{
+    var queryable = _context.Models
+        .Where(m => EF.Functions.ILike(m.Name, $"%{query}%"));
+
+    if (cursorId.HasValue)
+    {
+        var cursor = await _context.Models.FindAsync(cursorId.Value);
+        queryable = queryable
+            .Where(m => m.CreatedAt < cursor.CreatedAt || 
+                       (m.CreatedAt == cursor.CreatedAt && m.Id.CompareTo(cursor.Id) < 0));
+    }
+
+    var models = await queryable
+        .OrderByDescending(m => m.CreatedAt)
+        .ThenByDescending(m => m.Id)
+        .Take(pageSize + 1)
+        .ToListAsync();
+
+    var hasMore = models.Count > pageSize;
+    if (hasMore) models.RemoveAt(pageSize);
+
+    return new PagedResult<Model3DDto>
+    {
+        Items = models.Select(MapToDto).ToList(),
+        NextCursor = hasMore ? models.Last().Id : null,
+        HasMore = hasMore
+    };
+}
+```
+
+**5. Recherche Elasticsearch pour Performance**
+
+```csharp
+// Index Elasticsearch pour recherche ultra-rapide
+public class ElasticsearchService : ISearchService
+{
+    private readonly IElasticClient _client;
+
+    public async Task<List<Model3DDto>> SearchAsync(string query, int size = 20)
+    {
+        var response = await _client.SearchAsync<Model3DDocument>(s => s
+            .Index("models")
+            .Size(size)
+            .Query(q => q
+                .MultiMatch(mm => mm
+                    .Fields(f => f
+                        .Field(model => model.Name, boost: 3)
+                        .Field(model => model.Description, boost: 1)
+                        .Field(model => model.Author, boost: 2))
+                    .Query(query)
+                    .Fuzziness(Fuzziness.Auto)
+                    .Type(TextQueryType.BestFields)))
+            .Highlight(h => h
+                .Fields(f => f
+                    .Field(model => model.Name)
+                    .Field(model => model.Description))));
+
+        return response.Documents.Select(MapToDto).ToList();
+    }
+}
+```
+
+**6. Requêtes Optimisées avec Projections**
+
+```csharp
+// Éviter SELECT * - Charger uniquement les colonnes nécessaires
+public async Task<List<Model3DListDto>> GetModelsForListAsync()
+{
+    return await _context.Models
+        .AsNoTracking() // Pas de change tracking pour lecture seule
+        .Select(m => new Model3DListDto
+        {
+            Id = m.Id,
+            Name = m.Name,
+            Author = m.Author,
+            ThumbnailUrl = m.ThumbnailUrl,
+            AverageRating = m.AverageRating,
+            Downloads = m.Downloads
+        })
+        .ToListAsync();
+}
+```
+
+**7. Monitoring et Métriques**
+
+```csharp
+// Logging des requêtes lentes
+services.AddDbContext<ApplicationDbContext>(options =>
+{
+    options.UseNpgsql(connectionString)
+        .EnableSensitiveDataLogging(isDevelopment)
+        .LogTo(
+            log => Log.Warning("Slow query detected: {Query}", log),
+            (eventId, level) => level >= LogLevel.Warning,
+            DbContextLoggerOptions.SingleLine)
+        .ConfigureWarnings(warnings =>
+            warnings.Throw(RelationalEventId.MultipleCollectionIncludeWarning));
+});
+```
+
+**Métriques de Performance Attendues:**
+- **Recherche simple** (nom): < 50ms pour 10M+ modèles (avec index B-tree)
+- **Recherche textuelle** (pg_trgm): < 100ms pour 10M+ modèles
+- **Recherche Elasticsearch**: < 20ms pour 100M+ documents
+- **Pagination cursor-based**: Temps constant O(1) indépendant du numéro de page
+- **Cache Redis**: < 5ms pour données populaires
 
 ### 2.4 Services Externes et Intégrations
 

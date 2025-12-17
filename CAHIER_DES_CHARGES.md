@@ -117,8 +117,10 @@ Ce document se concentre principalement sur la phase 1 (Application Web), avec d
     - Limitations : Taille max 10MB par modèle pour rendu web
 
 - **Informations du modèle** :
+  - **Auteur/Créateur** : Affichage du nom de l'auteur/créateur du modèle
   - Nom et description
   - Créateur / Source
+  - Licence (CC BY, CC BY-SA, usage commercial, etc.)
   - Dimensions (L x l x h)
   - Poids estimé du modèle imprimé
   - Temps d'impression approximatif
@@ -143,16 +145,12 @@ Le système doit analyser automatiquement chaque modèle sélectionné pour dét
   - Possibilité de découpage en plusieurs parties si trop grand
   - Suggestion d'échelle optimale
 
-- **Analyse structurelle** :
-  - Détection des surfaces non supportées
-  - Calcul de la stabilité du modèle
-  - Identification des zones nécessitant des supports
-  - Épaisseur des parois (minimum 1mm recommandé)
-
 - **Estimation des coûts** :
   - Calcul du volume de matière nécessaire
   - Temps d'impression estimé
   - Prix total incluant matériaux, électricité, main d'œuvre
+
+> **Note Phase 1** : L'analyse structurelle avancée (détection des surfaces non supportées, calcul de stabilité, identification des zones nécessitant des supports, épaisseur des parois) sera développée dans une **Phase 3 future** après la mise en production. La Phase 1 se concentre sur les vérifications de base (matériaux, dimensions, coûts).
 
 #### 2.4.2 Rapport d'Analyse
 Affichage d'un rapport détaillé comprenant :
@@ -169,10 +167,11 @@ Affichage d'un rapport détaillé comprenant :
 L'utilisateur peut personnaliser :
 - **Matériau** : Choix parmi les matériaux compatibles
 - **Couleur** : Sélection de couleur (selon disponibilité)
-- **Qualité d'impression** :
-  - Brouillon (0.3mm) - rapide, moins détaillé
+- **Buse d'impression** : Sélection automatique ou manuelle de la buse en fonction de la qualité souhaitée
+- **Qualité d'impression** (dépendante de la buse disponible) :
+  - Brouillon (0.3mm+) - rapide, moins détaillé
   - Standard (0.2mm) - équilibre qualité/temps
-  - Haute qualité (0.1mm) - détails fins, plus long
+  - Haute qualité (0.1mm-0.15mm) - détails fins, plus long
 - **Options additionnelles** :
   - Remplissage (10% à 100%)
   - Post-traitement (ponçage, peinture)
@@ -273,7 +272,34 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
   - Vérification des commandes en cours utilisant ce matériau
   - Archivage plutôt que suppression définitive
 
-#### 2.7.4 Gestion des Sources de Modèles 3D
+#### 2.7.4 Gestion des Buses d'Impression
+**L'administrateur peut gérer les buses disponibles pour l'impression** (Phase 1) :
+- **Liste des buses** :
+  - Vue d'ensemble de toutes les buses configurées
+  - Informations : nom, diamètre (0.2mm, 0.4mm, 0.6mm, 0.8mm, etc.), matériau (laiton, acier trempé, ruby tip)
+  - Statut (active/inactive)
+  - Hauteurs de couche compatibles (min/max)
+  - Vitesse d'impression recommandée
+  - Compatibilité avec matériaux abrasifs
+- **Ajout de buses** :
+  - Nom descriptif (ex: "Buse 0.4mm Standard", "Buse 0.2mm Haute Précision")
+  - Diamètre en mm
+  - Matériau de fabrication
+  - Plage de hauteur de couche (min/max)
+  - Vitesse recommandée
+  - Support des matériaux abrasifs (carbone, métal)
+  - Description et cas d'usage
+- **Modification de buses** :
+  - Mise à jour des paramètres
+  - Désactivation temporaire si maintenance/remplacement nécessaire
+- **Relation avec la qualité d'impression** :
+  - **La qualité d'impression dépend directement des buses disponibles**
+  - Haute qualité (0.1-0.15mm) → Nécessite buse 0.2mm ou 0.4mm
+  - Standard (0.2mm) → Buse 0.4mm recommandée
+  - Brouillon/Rapide (0.3mm+) → Buse 0.6mm ou 0.8mm
+  - Sélection automatique de la buse en fonction de la qualité choisie par l'utilisateur
+
+#### 2.7.5 Gestion des Sources de Modèles 3D
 **L'administrateur peut configurer les sites web interrogés pour récupérer les modèles** :
 - **Liste des sources actives** :
   - Vue d'ensemble des sites configurés (Thingiverse, MyMiniFactory, Cults3D, etc.)
@@ -306,13 +332,13 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
   - Attribution correcte des sources
   - Respect du RGPD et des droits d'auteur
 
-#### 2.7.5 Gestion des Utilisateurs
+#### 2.7.6 Gestion des Utilisateurs
 - Liste des utilisateurs inscrits
 - Modération (bannissement, suspension)
 - Gestion des rôles (utilisateur, administrateur)
 - Statistiques d'utilisation
 
-#### 2.7.6 Statistiques et Rapports
+#### 2.7.7 Statistiques et Rapports
 - Nombre de recherches par jour/mois
 - Modèles les plus demandés
 - Chiffre d'affaires
@@ -397,9 +423,25 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
 - **SGBD Principal** : PostgreSQL 16+ ou SQL Server 2022
 - **ORM** : Entity Framework Core 10
 - **Schéma de données** :
-  - Tables : Users, Models, Orders, Categories, Materials, Reviews
+  - Tables : Users, Models, Orders, Categories, Materials, Nozzles, ModelSources, Reviews
   - Relations : One-to-Many, Many-to-Many avec tables de jointure
   - Index optimisés pour les requêtes de recherche
+- **Optimisation pour millions de modèles** :
+  - **La base de données doit gérer efficacement plusieurs millions de résultats avec latence et temps de réponse minimaux**
+  - Indexation avancée (B-tree, GIN pour recherche full-text PostgreSQL)
+  - Index composites pour tri par popularité (rating + downloads)
+  - Index partiels pour filtres courants (is_active = true)
+  - Pagination cursor-based (éviter OFFSET sur grandes tables)
+  - Partitionnement des tables si >10M records (par année/catégorie)
+  - Mise en cache Redis pour requêtes fréquentes
+  - Elasticsearch/Azure Search pour recherche ultra-rapide (<20ms)
+  - Projections SELECT pour éviter surcharge mémoire
+  - Monitoring des requêtes lentes (>50ms)
+  - **Métriques de performance attendues** :
+    - Recherche simple (nom exact) : <50ms pour 10M+ modèles
+    - Recherche textuelle (pg_trgm) : <100ms pour 10M+ modèles
+    - Recherche Elasticsearch : <20ms pour 100M+ documents
+    - Pagination : temps constant O(1) indépendant du numéro de page
 
 #### 3.2.3 Stockage de Fichiers
 - **Fichiers 3D** : Azure Blob Storage ou AWS S3
@@ -422,15 +464,25 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
   - Comparaison par similarité
 
 #### 3.2.5 Analyse de Modèles 3D
+**Phase 1** (Analyse de base) :
+- **Paramètres analysés** :
+  - Volume imprimable et dimensions
+  - Calcul du volume de matière nécessaire
+  - Estimation du temps d'impression
+  - Vérification compatibilité avec volume d'impression
+
+**Phase 3** (Analyse structurelle avancée - développement futur) :
 - **Librairies** :
   - OpenCascade ou CGAL pour analyse géométrique
   - Slic3r API ou PrusaSlicer pour simulation de slicing
-  - Calcul de volume, surface, bbox
 - **Paramètres analysés** :
-  - Volume imprimable
-  - Zones non supportées
+  - Zones non supportées (overhangs)
   - Épaisseur des parois
-  - Overhangs critiques
+  - Détection des surfaces critiques
+  - Stabilité structurelle
+  - Calcul automatique des supports nécessaires
+
+> **Note** : L'analyse structurelle complète sera implémentée après la mise en production de la Phase 1, permettant de se concentrer initialement sur les fonctionnalités essentielles.
 
 ### 3.3 Sécurité
 
@@ -1010,19 +1062,24 @@ Le développeur travaillera **en temps partiel** sur ce projet, alternant avec d
 ### 10.1 Fonctionnels - Phase 1 (Application Web)
 - ✅ Inscription et connexion sécurisées avec **HTTPS obligatoire**
 - ✅ Noms d'utilisateurs chiffrés en base de données
+- ✅ **Affichage de l'auteur/créateur sur chaque modèle 3D**
 - ✅ Recherche textuelle avec résultats pertinents (< 500ms)
 - ✅ Recherche par photo opérationnelle (< 3s)
+- ✅ **Base de données optimisée pour millions de modèles** (<50ms recherche, <100ms full-text)
 - ✅ Visualisation de modèles avec images statiques multiples (Version 1)
 - ⏳ Visualisation 3D interactive (Version 2 - développement ultérieur)
 - ✅ **Compression automatique des images uploadées** (WebP + JPG fallback)
-- ✅ Analyse de printabilité automatique (< 10s)
+- ✅ Analyse de printabilité automatique de base (< 10s) - dimensions, matériaux, coûts
+- ⏳ Analyse structurelle avancée (Phase 3 - développement ultérieur)
 - ✅ Workflow de commande complet
+- ✅ **Qualité d'impression liée aux buses disponibles**
 - ✅ **Notifications email automatiques à l'imprimeur pour chaque nouvelle commande**
 - ✅ Notifications par email aux utilisateurs
 - ✅ **Messages d'erreur explicites et actionnables**
 - ✅ Tableau de bord admin avec toutes fonctionnalités :
   - Gestion des commandes avec notifications email
   - **Gestion des matériaux** (ajout, modification, suppression, activation/désactivation)
+  - **Gestion des buses d'impression** (CRUD complet, configuration qualité/buse)
   - **Gestion des sources de modèles 3D** (configuration des sites web interrogés)
   - Monitoring des synchronisations et statistiques des sources
   - Gestion des utilisateurs et rôles
