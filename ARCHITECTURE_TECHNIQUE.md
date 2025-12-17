@@ -992,6 +992,307 @@ public class PrintabilityReport
 }
 ```
 
+#### 2.4.3 Service de Notification Email pour l'Imprimeur
+
+```csharp
+public interface IEmailNotificationService
+{
+    Task SendNewOrderNotificationToAdminAsync(Order order, User customer);
+    Task SendOrderStatusUpdateToCustomerAsync(Order order, User customer);
+}
+
+public class EmailNotificationService : IEmailNotificationService
+{
+    private readonly SendGridClient _sendGridClient;
+    private readonly IConfiguration _configuration;
+    private readonly ILogger<EmailNotificationService> _logger;
+
+    public EmailNotificationService(
+        IConfiguration configuration,
+        ILogger<EmailNotificationService> logger)
+    {
+        _configuration = configuration;
+        _logger = logger;
+        
+        var apiKey = configuration["SendGrid:ApiKey"];
+        _sendGridClient = new SendGridClient(apiKey);
+    }
+
+    /// <summary>
+    /// Envoie un email de notification à l'administrateur/imprimeur 
+    /// lorsqu'une nouvelle commande est reçue
+    /// </summary>
+    public async Task SendNewOrderNotificationToAdminAsync(Order order, User customer)
+    {
+        try
+        {
+            var adminEmail = _configuration["SendGrid:AdminEmail"];
+            var fromEmail = _configuration["SendGrid:FromEmail"];
+            var fromName = _configuration["SendGrid:FromName"];
+
+            var subject = $"🔔 Nouvelle commande #{order.OrderNumber}";
+            
+            var htmlContent = $@"
+                <html>
+                <body style='font-family: Arial, sans-serif;'>
+                    <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
+                        <h2 style='color: #4F46E5;'>Nouvelle Commande d'Impression 3D</h2>
+                        
+                        <div style='background-color: #F3F4F6; padding: 15px; border-radius: 8px; margin: 20px 0;'>
+                            <h3>📋 Détails de la Commande</h3>
+                            <p><strong>Référence :</strong> {order.OrderNumber}</p>
+                            <p><strong>Date :</strong> {order.CreatedAt:dd/MM/yyyy à HH:mm}</p>
+                            <p><strong>Modèle :</strong> {order.Model.Name}</p>
+                            <p><strong>Matériau :</strong> {order.Material.Name}</p>
+                            <p><strong>Couleur :</strong> {order.Color}</p>
+                            <p><strong>Qualité :</strong> {order.Quality}</p>
+                            <p><strong>Prix Total :</strong> {order.TotalCost:C}</p>
+                        </div>
+
+                        <div style='background-color: #EFF6FF; padding: 15px; border-radius: 8px; margin: 20px 0;'>
+                            <h3>👤 Informations Client</h3>
+                            <p><strong>Nom :</strong> {customer.FirstName} {customer.LastName}</p>
+                            <p><strong>Email :</strong> {customer.Email}</p>
+                            <p><strong>Adresse de livraison :</strong><br/>{order.ShippingAddress}</p>
+                        </div>
+
+                        <div style='margin: 30px 0;'>
+                            <a href='https://app.print3dfinder.com/admin/orders/{order.Id}' 
+                               style='background-color: #4F46E5; color: white; padding: 12px 24px; 
+                                      text-decoration: none; border-radius: 6px; display: inline-block;'>
+                                📊 Voir la commande dans le tableau de bord
+                            </a>
+                        </div>
+
+                        <hr style='margin: 30px 0; border: none; border-top: 1px solid #E5E7EB;'/>
+                        
+                        <p style='color: #6B7280; font-size: 12px;'>
+                            Cette notification a été envoyée automatiquement par Print3D Finder.
+                        </p>
+                    </div>
+                </body>
+                </html>
+            ";
+
+            var plainTextContent = $@"
+                Nouvelle Commande d'Impression 3D
+                
+                Référence: {order.OrderNumber}
+                Date: {order.CreatedAt:dd/MM/yyyy à HH:mm}
+                Modèle: {order.Model.Name}
+                Matériau: {order.Material.Name}
+                Couleur: {order.Color}
+                Qualité: {order.Quality}
+                Prix Total: {order.TotalCost:C}
+                
+                Client: {customer.FirstName} {customer.LastName}
+                Email: {customer.Email}
+                Adresse: {order.ShippingAddress}
+                
+                Voir la commande: https://app.print3dfinder.com/admin/orders/{order.Id}
+            ";
+
+            var msg = MailHelper.CreateSingleEmail(
+                new EmailAddress(fromEmail, fromName),
+                new EmailAddress(adminEmail),
+                subject,
+                plainTextContent,
+                htmlContent
+            );
+
+            var response = await _sendGridClient.SendEmailAsync(msg);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.Accepted || 
+                response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                _logger.LogInformation(
+                    "Email de notification envoyé avec succès pour la commande {OrderNumber}", 
+                    order.OrderNumber);
+            }
+            else
+            {
+                _logger.LogWarning(
+                    "Échec de l'envoi de l'email pour la commande {OrderNumber}. Status: {StatusCode}", 
+                    order.OrderNumber, 
+                    response.StatusCode);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, 
+                "Erreur lors de l'envoi de l'email de notification pour la commande {OrderNumber}", 
+                order.OrderNumber);
+            // Ne pas bloquer la création de commande si l'email échoue
+        }
+    }
+
+    /// <summary>
+    /// Envoie un email au client lorsque le statut de sa commande change
+    /// </summary>
+    public async Task SendOrderStatusUpdateToCustomerAsync(Order order, User customer)
+    {
+        try
+        {
+            var fromEmail = _configuration["SendGrid:FromEmail"];
+            var fromName = _configuration["SendGrid:FromName"];
+
+            var statusText = order.Status switch
+            {
+                OrderStatus.PendingValidation => "En attente de validation",
+                OrderStatus.InPreparation => "En cours de préparation",
+                OrderStatus.Printing => "En impression",
+                OrderStatus.PostProcessing => "Post-traitement en cours",
+                OrderStatus.ReadyToShip => "Prêt à l'expédition",
+                OrderStatus.Shipped => "Expédié",
+                OrderStatus.Delivered => "Livré",
+                _ => "Mis à jour"
+            };
+
+            var subject = $"📦 Commande #{order.OrderNumber} - {statusText}";
+            
+            var htmlContent = $@"
+                <html>
+                <body style='font-family: Arial, sans-serif;'>
+                    <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
+                        <h2 style='color: #4F46E5;'>Mise à Jour de Votre Commande</h2>
+                        
+                        <p>Bonjour {customer.FirstName},</p>
+                        
+                        <p>Votre commande <strong>#{order.OrderNumber}</strong> a été mise à jour.</p>
+                        
+                        <div style='background-color: #F3F4F6; padding: 15px; border-radius: 8px; margin: 20px 0;'>
+                            <h3>📋 Statut Actuel</h3>
+                            <p style='font-size: 18px; color: #4F46E5;'><strong>{statusText}</strong></p>
+                            <p><strong>Modèle :</strong> {order.Model.Name}</p>
+                        </div>
+
+                        <div style='margin: 30px 0;'>
+                            <a href='https://app.print3dfinder.com/orders/{order.Id}' 
+                               style='background-color: #4F46E5; color: white; padding: 12px 24px; 
+                                      text-decoration: none; border-radius: 6px; display: inline-block;'>
+                                📊 Suivre ma commande
+                            </a>
+                        </div>
+
+                        <p style='color: #6B7280;'>
+                            Merci de votre confiance !<br/>
+                            L'équipe Print3D Finder
+                        </p>
+                    </div>
+                </body>
+                </html>
+            ";
+
+            var msg = MailHelper.CreateSingleEmail(
+                new EmailAddress(fromEmail, fromName),
+                new EmailAddress(customer.Email, $"{customer.FirstName} {customer.LastName}"),
+                subject,
+                $"Votre commande #{order.OrderNumber} est maintenant : {statusText}",
+                htmlContent
+            );
+
+            await _sendGridClient.SendEmailAsync(msg);
+
+            _logger.LogInformation(
+                "Email de mise à jour envoyé au client pour la commande {OrderNumber}", 
+                order.OrderNumber);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, 
+                "Erreur lors de l'envoi de l'email au client pour la commande {OrderNumber}", 
+                order.OrderNumber);
+        }
+    }
+}
+
+// Utilisation dans OrderService
+public class OrderService : IOrderService
+{
+    private readonly ApplicationDbContext _context;
+    private readonly IEmailNotificationService _emailService;
+    private readonly ILogger<OrderService> _logger;
+
+    public OrderService(
+        ApplicationDbContext context,
+        IEmailNotificationService emailService,
+        ILogger<OrderService> logger)
+    {
+        _context = context;
+        _emailService = emailService;
+        _logger = logger;
+    }
+
+    public async Task<Order> CreateOrderAsync(CreateOrderRequest request)
+    {
+        var order = new Order
+        {
+            Id = Guid.NewGuid(),
+            OrderNumber = GenerateOrderNumber(),
+            UserId = request.UserId,
+            ModelId = request.ModelId,
+            MaterialId = request.MaterialId,
+            Color = request.Color,
+            Quality = request.Quality,
+            Status = OrderStatus.PendingValidation,
+            CreatedAt = DateTime.UtcNow,
+            // ... autres propriétés
+        };
+
+        _context.Orders.Add(order);
+        await _context.SaveChangesAsync();
+
+        // Charger les relations pour l'email
+        await _context.Entry(order)
+            .Reference(o => o.Model)
+            .LoadAsync();
+        await _context.Entry(order)
+            .Reference(o => o.Material)
+            .LoadAsync();
+        await _context.Entry(order)
+            .Reference(o => o.User)
+            .LoadAsync();
+
+        // ⚡ Envoi automatique de l'email à l'imprimeur
+        await _emailService.SendNewOrderNotificationToAdminAsync(order, order.User);
+
+        _logger.LogInformation(
+            "Nouvelle commande créée : {OrderNumber} par {UserId}", 
+            order.OrderNumber, 
+            request.UserId);
+
+        return order;
+    }
+
+    public async Task UpdateOrderStatusAsync(Guid orderId, OrderStatus newStatus)
+    {
+        var order = await _context.Orders
+            .Include(o => o.User)
+            .Include(o => o.Model)
+            .FirstOrDefaultAsync(o => o.Id == orderId);
+
+        if (order == null)
+            throw new NotFoundException("Commande introuvable");
+
+        order.Status = newStatus;
+        await _context.SaveChangesAsync();
+
+        // Notification au client
+        await _emailService.SendOrderStatusUpdateToCustomerAsync(order, order.User);
+
+        _logger.LogInformation(
+            "Commande {OrderNumber} mise à jour : {Status}", 
+            order.OrderNumber, 
+            newStatus);
+    }
+
+    private string GenerateOrderNumber()
+    {
+        return $"REF-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString()[..8].ToUpper()}";
+    }
+}
+```
+
 ## 3. Sécurité
 
 ### 3.1 Chiffrement des Noms d'Utilisateurs
@@ -1081,7 +1382,8 @@ public class UserEncryptionService
   "SendGrid": {
     "ApiKey": "SG.xxxxx",
     "FromEmail": "noreply@print3dfinder.com",
-    "FromName": "Print3D Finder"
+    "FromName": "Print3D Finder",
+    "AdminEmail": "admin@print3dfinder.com"
   },
   "Firebase": {
     "ServerKey": "xxxxx",

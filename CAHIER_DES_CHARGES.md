@@ -13,9 +13,11 @@ Fournir une solution complète permettant aux utilisateurs de :
 - Soumettre des demandes d'impression sécurisées
 
 ### 1.3 Portée du Projet
-Le projet comprend deux applications complémentaires :
-- **Application Web** : Développée avec Blazor .NET 10
-- **Application Mobile** : Développée avec .NET MAUI
+Le projet est développé par un développeur solo et se déroule en deux phases principales :
+- **Phase 1 - Application Web** : Développée avec Blazor .NET 10 (priorité initiale)
+- **Phase 2 - Application Mobile** : Développée avec .NET MAUI (développement ultérieur)
+
+Ce document se concentre principalement sur la phase 1 (Application Web), avec des spécifications pour la phase 2 (Mobile) qui sera développée après la mise en production de l'application web.
 
 ## 2. Spécifications Fonctionnelles
 
@@ -29,6 +31,7 @@ Le projet comprend deux applications complémentaires :
   - Confirmation d'email obligatoire
   
 - **Connexion sécurisée** :
+  - **Connexion HTTPS obligatoire** (TLS 1.3) pour toutes les communications
   - Authentification via JWT (JSON Web Tokens)
   - Support de l'authentification à deux facteurs (2FA) optionnelle
   - Limitation des tentatives de connexion pour prévenir les attaques par force brute
@@ -177,6 +180,16 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
 - Informations client (chiffrées)
 - Référence de commande unique
 
+**Notification automatique à l'imprimeur** :
+- **Email immédiat** envoyé à l'administrateur/imprimeur lors de la réception d'une nouvelle demande
+- Contenu de l'email :
+  - Référence de commande
+  - Nom du modèle
+  - Matériau et configuration choisis
+  - Informations client (nom, email, adresse)
+  - Lien direct vers le tableau de bord pour traiter la commande
+  - Date et heure de la demande
+
 ### 2.6 Gestion des Commandes (Utilisateur)
 
 #### 2.6.1 Suivi des Commandes
@@ -204,6 +217,7 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
 
 #### 2.7.1 Gestion des Commandes
 - Liste de toutes les commandes en temps réel
+- **Réception d'emails de notification** pour chaque nouvelle commande
 - Filtres par statut, date, client
 - Actions :
   - Accepter/Refuser une commande
@@ -316,6 +330,11 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
 ### 3.3 Sécurité
 
 #### 3.3.1 Authentification et Autorisation
+- **HTTPS obligatoire** :
+  - **Toutes les communications doivent utiliser HTTPS (TLS 1.3)**
+  - Redirection automatique HTTP vers HTTPS
+  - Certificat SSL/TLS valide et à jour
+  - HSTS (HTTP Strict Transport Security) activé
 - **Hashage des mots de passe** : bcrypt ou Argon2id
 - **Tokens JWT** :
   - Expiration : 1 heure (access token)
@@ -323,12 +342,12 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
   - Stockage sécurisé (HttpOnly cookies pour web, Secure Storage pour mobile)
 - **Rôles et permissions** :
   - User (utilisateur standard)
-  - Admin (administrateur)
+  - Admin (administrateur/imprimeur)
   - Super Admin (gestion complète)
 
 #### 3.3.2 Protection des Données
 - **Chiffrement** :
-  - Données en transit : TLS 1.3
+  - **Données en transit : HTTPS/TLS 1.3 obligatoire pour toutes les requêtes**
   - Données au repos : AES-256
   - Noms d'utilisateurs : chiffrement avec clé secrète côté serveur
 - **RGPD** :
@@ -494,11 +513,14 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
 
 ## 6. Livrables Attendus
 
-### 6.1 Applications
-- ✅ Application web Blazor (.NET 10) fonctionnelle
-- ✅ Application mobile MAUI (Android & iOS) fonctionnelle
-- ✅ API REST documentée
-- ✅ Tableau de bord administrateur
+### 6.1 Applications - Phase 1 (Prioritaire)
+- ✅ Application web Blazor (.NET 10) fonctionnelle avec connexion HTTPS
+- ✅ API REST documentée avec authentification sécurisée
+- ✅ Tableau de bord administrateur avec notifications email
+- ✅ Système de notification email pour l'imprimeur
+
+### 6.1.2 Applications - Phase 2 (Ultérieure)
+- ⏳ Application mobile MAUI (Android & iOS) - Développement après Phase 1
 
 ### 6.2 Documentation
 - ✅ Documentation utilisateur (guide d'utilisation)
@@ -526,23 +548,39 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
 - Configuration de l'environnement de développement
 
 ### Phase 2 : Développement Backend (8 semaines)
-- API REST avec authentification
+- API REST avec authentification HTTPS/TLS 1.3
 - Gestion des utilisateurs (sécurité des noms)
 - Moteur de recherche textuelle
 - Intégration recherche par image (IA)
 - Analyse de modèles 3D
 - Gestion des commandes
+- **Système de notification email pour l'imprimeur**
 
 ### Phase 3 : Développement Frontend Web (6 semaines)
 - Application Blazor (.NET 10)
-- Pages d'authentification
+- Pages d'authentification (connexion HTTPS)
 - Interface de recherche (texte + photo)
 - Visualisation 3D des modèles
 - Workflow de commande
 - Tableau de bord utilisateur
 - Panneau administrateur
 
-### Phase 4 : Développement Mobile (6 semaines)
+### Phase 4 : Tests et Optimisations (4 semaines)
+- Tests unitaires et d'intégration
+- Tests de charge et performance
+- Tests de sécurité (HTTPS, authentification)
+- Corrections de bugs
+- Optimisations
+
+### Phase 5 : Déploiement et Lancement (2 semaines)
+- Déploiement en production avec HTTPS
+- Configuration CDN et monitoring
+- Configuration des emails de notification
+- Lancement beta
+- Collecte de feedback
+
+### Phase 6 : Développement Mobile (6 semaines) - **Phase ultérieure**
+**Cette phase sera développée après la mise en production de l'application web**
 - Application .NET MAUI
 - Interface native Android/iOS
 - Intégration caméra et galerie
@@ -550,30 +588,20 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
 - Notifications push
 - Tests sur différents appareils
 
-### Phase 5 : Tests et Optimisations (4 semaines)
-- Tests unitaires et d'intégration
-- Tests de charge et performance
-- Tests de sécurité
-- Corrections de bugs
-- Optimisations
-
-### Phase 6 : Déploiement et Lancement (2 semaines)
-- Déploiement en production
-- Configuration CDN et monitoring
-- Formation des administrateurs
-- Lancement beta
-- Collecte de feedback
-
 ## 8. Budget Prévisionnel
 
 ### 8.1 Ressources Humaines
-- Chef de projet : 30 semaines
-- Développeur Backend .NET : 14 semaines
-- Développeur Frontend Blazor : 6 semaines
-- Développeur Mobile MAUI : 6 semaines
-- UI/UX Designer : 4 semaines
-- DevOps/Infrastructure : 4 semaines
-- Testeur QA : 4 semaines
+**Développement Solo** :
+- Développeur Full-Stack .NET : 24 semaines (Phase 1-5)
+  - Backend API (.NET 10) : 8 semaines
+  - Frontend Blazor : 6 semaines
+  - Conception et design : 4 semaines
+  - Tests et déploiement : 6 semaines
+
+**Phase Mobile ultérieure** :
+- Développeur Mobile MAUI : 6 semaines supplémentaires
+
+**Note** : Les estimations sont basées sur un développement à temps plein. Le projet étant réalisé par un seul développeur, les phases peuvent être ajustées selon la disponibilité.
 
 ### 8.2 Infrastructure (mensuel)
 - Hébergement Cloud (Azure/AWS) : 200-500€
@@ -584,10 +612,10 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
 - **Total mensuel estimé** : 420-1200€
 
 ### 8.3 Outils et Licences
-- Visual Studio Professional : 599€/an
-- Compte développeur Apple : 99€/an
-- Compte développeur Google : 25€ (unique)
-- Outils de design (Figma Pro) : 144€/an
+- Visual Studio Community (gratuit) ou Professional : 0-599€/an
+- Compte développeur Apple (Phase Mobile) : 99€/an
+- Compte développeur Google (Phase Mobile) : 25€ (unique)
+- Outils de design (Figma gratuit ou Pro) : 0-144€/an
 - Monitoring (Application Insights) : inclus Azure
 
 ## 9. Risques et Mitigation
@@ -617,18 +645,22 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
 
 ## 10. Critères d'Acceptation
 
-### 10.1 Fonctionnels
-- ✅ Inscription et connexion sécurisées fonctionnelles
+### 10.1 Fonctionnels - Phase 1 (Application Web)
+- ✅ Inscription et connexion sécurisées avec **HTTPS obligatoire**
 - ✅ Noms d'utilisateurs chiffrés en base de données
 - ✅ Recherche textuelle avec résultats pertinents (< 500ms)
 - ✅ Recherche par photo opérationnelle (< 3s)
 - ✅ Visualisation 3D interactive
 - ✅ Analyse de printabilité automatique (< 10s)
 - ✅ Workflow de commande complet
-- ✅ Notifications par email et push
+- ✅ **Notifications email automatiques à l'imprimeur pour chaque nouvelle commande**
+- ✅ Notifications par email aux utilisateurs
 - ✅ Tableau de bord admin avec toutes fonctionnalités
 - ✅ Application web Blazor .NET 10 déployée
-- ✅ Application mobile MAUI (Android + iOS) publiée
+
+### 10.1.2 Fonctionnels - Phase 2 (Application Mobile)
+- ⏳ Application mobile MAUI (Android + iOS) publiée
+- ⏳ Notifications push mobiles
 
 ### 10.2 Non Fonctionnels
 - ✅ Temps de chargement < 2s
@@ -640,9 +672,12 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
 - ✅ Documentation complète livrée
 
 ### 10.3 Sécurité
+- ✅ **Connexion HTTPS/TLS 1.3 obligatoire pour toutes les communications**
 - ✅ Audit de sécurité passé sans faille critique
 - ✅ Tests de pénétration validés
-- ✅ Chiffrement TLS 1.3 actif
+- ✅ Certificat SSL/TLS valide installé
+- ✅ Redirection automatique HTTP vers HTTPS
+- ✅ HSTS activé
 - ✅ Mots de passe hashés avec Argon2/bcrypt
 - ✅ Tokens JWT avec expiration
 - ✅ Rate limiting configuré

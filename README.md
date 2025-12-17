@@ -6,11 +6,14 @@
 
 ## 📋 Description
 
-Print3D Finder est une application web et mobile permettant aux utilisateurs de rechercher des modèles 3D à imprimer via :
+Print3D Finder est une plateforme web (et future application mobile) permettant aux utilisateurs de rechercher des modèles 3D à imprimer via :
 - 🔍 **Recherche textuelle** intelligente avec filtres avancés
 - 📸 **Recherche par photo** grâce à l'intelligence artificielle
 - 🔬 **Analyse automatique** de la printabilité des modèles
 - 🖨️ **Service d'impression** professionnel intégré
+
+**Phase 1** : Application Web Blazor (en cours de développement)  
+**Phase 2** : Application Mobile MAUI (développement ultérieur)
 
 ## 🎯 Objectifs
 
@@ -27,9 +30,10 @@ Fournir une solution complète permettant aux utilisateurs de :
 - **Langage**: C# 12
 - **UI**: Tailwind CSS / MudBlazor
 - **Authentification**: ASP.NET Core Identity + JWT
+- **Sécurité**: Connexion HTTPS obligatoire
 
-### Application Mobile
-- **Framework**: .NET MAUI (.NET 10)
+### Application Mobile (Phase 2)
+- **Framework**: .NET MAUI (.NET 10) - *Développement ultérieur*
 - **Plateformes**: Android 7.0+ (API 24+), iOS 13+
 - **Interface**: XAML + MAUI Community Toolkit
 
@@ -43,10 +47,11 @@ Fournir une solution complète permettant aux utilisateurs de :
 
 ## 🔐 Sécurité
 
+- ✅ **Connexion HTTPS obligatoire** (TLS 1.3) pour toutes les communications
 - ✅ **Noms d'utilisateurs sécurisés** (chiffrement et hachage en base de données)
 - ✅ Authentification JWT avec tokens d'expiration
 - ✅ Hashage des mots de passe avec bcrypt/Argon2id
-- ✅ Chiffrement TLS 1.3 pour toutes les communications
+- ✅ Certificat SSL/TLS valide et HSTS activé
 - ✅ Protection contre SQL Injection, XSS, CSRF
 - ✅ Conformité RGPD (droit à l'oubli, export de données)
 - ✅ Rate limiting et protection DDoS
@@ -73,12 +78,13 @@ Pour les spécifications complètes du projet, consultez le **[Cahier des Charge
 - 📊 Analyse automatique de printabilité
 - ⚙️ Configuration personnalisée (matériau, couleur, qualité)
 - 🛒 Commande et suivi d'impression
-- 📧 Notifications email et push
+- 📧 Notifications email
 - 📜 Historique des commandes
 - ⭐ Évaluation et avis
 
-### Pour les Administrateurs
+### Pour les Administrateurs / Imprimeur
 - 📊 Tableau de bord avec statistiques
+- **📧 Notification email automatique** pour chaque nouvelle commande reçue
 - 📦 Gestion des commandes en temps réel
 - 🎨 Gestion des modèles 3D
 - 👥 Gestion des utilisateurs
@@ -86,20 +92,47 @@ Pour les spécifications complètes du projet, consultez le **[Cahier des Charge
 
 ## 🗺️ Roadmap
 
-### ✅ Phase 1 : Prototype UI (Actuel - React/Vite)
+### ✅ Phase 0 : Prototype UI (Actuel - React/Vite)
 - Interface de recherche
 - Visualisation des résultats
 - Pages de détails et commande
 - Authentification basique
 
-### 🔨 Phase 2 : Migration Blazor .NET 10
-- Migration complète vers Blazor
-- Implémentation backend ASP.NET Core
-- Intégration base de données
-- Authentification JWT sécurisée
+### 🔨 Phase 1 : Conception et Préparation (4 semaines)
+- Finalisation cahier des charges
+- Design UI/UX
+- Architecture technique
 
-### 📱 Phase 3 : Application Mobile MAUI
+### 🔨 Phase 2 : Backend API (.NET 10) (8 semaines)
+- API REST avec authentification HTTPS
+- Gestion utilisateurs sécurisée
+- Recherche textuelle et par image
+- Système de notification email pour l'imprimeur
+
+### 🔨 Phase 3 : Frontend Web Blazor (6 semaines)
+- Migration complète vers Blazor .NET 10
+- Connexion HTTPS obligatoire
+- Interface de recherche complète
+- Workflow de commande
+- Tableau de bord administrateur
+
+### 🧪 Phase 4 : Tests et Déploiement (6 semaines)
+- Tests de sécurité (HTTPS, authentification)
+- Tests de performance
+- Déploiement en production avec HTTPS
+
+### 📱 Phase 5 : Application Mobile MAUI (Ultérieure)
+**Développement après la mise en production de l'application web**
 - Application native Android/iOS
+- Intégration caméra pour recherche photo
+- Notifications push
+- Synchronisation avec backend
+
+## 👨‍💻 Contexte de Développement
+
+Ce projet est développé par un **développeur solo**, avec une approche progressive :
+1. **Priorité** : Application web complète et fonctionnelle
+2. **Ensuite** : Application mobile une fois le web stabilisé
 - Intégration caméra pour recherche photo
 - Notifications push
 - Synchronisation avec backend
