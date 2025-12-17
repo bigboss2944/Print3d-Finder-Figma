@@ -1605,7 +1605,359 @@ public class OrderService : IOrderService
 }
 ```
 
-## 6. Tests
+### 5.2 Sécurité des Logs - Protection des Credentials
+
+**IMPORTANT** : Les credentials (mots de passe, tokens, clés API) ne doivent **JAMAIS** apparaître dans les logs.
+
+```csharp
+// Middleware de filtrage des logs sensibles
+public class SensitiveDataLoggingFilter : ILogger
+{
+    private readonly ILogger _innerLogger;
+    private readonly string[] _sensitiveFields = new[]
+    {
+        "password", "token", "apikey", "secret", "credential",
+        "authorization", "api-key", "bearer"
+    };
+
+    public void Log<TState>(
+        LogLevel logLevel,
+        EventId eventId,
+        TState state,
+        Exception exception,
+        Func<TState, Exception, string> formatter)
+    {
+        if (state == null) return;
+
+        var message = formatter(state, exception);
+        var sanitizedMessage = SanitizeMessage(message);
+
+        _innerLogger.Log(logLevel, eventId, sanitizedMessage, exception, 
+            (m, ex) => m.ToString());
+    }
+
+    private string SanitizeMessage(string message)
+    {
+        if (string.IsNullOrEmpty(message)) return message;
+
+        // Masquer les credentials dans les requêtes HTTP
+        message = Regex.Replace(message, 
+            @"(password|token|apikey|secret|authorization)[\s]*[:=][\s]*[^\s&,]+", 
+            "$1=***REDACTED***", 
+            RegexOptions.IgnoreCase);
+
+        // Masquer les emails partiellement
+        message = Regex.Replace(message,
+            @"([a-zA-Z0-9._%+-]+)@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})",
+            m => $"{m.Groups[1].Value[0]}***@{m.Groups[2].Value}");
+
+        return message;
+    }
+}
+
+// Configuration dans Program.cs
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddFilter<SensitiveDataLoggingFilter>((category, level) => level >= LogLevel.Information);
+
+// Configuration Serilog avec enrichissement sécurisé
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", LogLevel.Warning)
+    .Enrich.FromLogContext()
+    .Enrich.WithMachineName()
+    .Enrich.WithEnvironmentName()
+    .Destructure.ByTransforming<User>(u => new 
+    { 
+        Id = u.Id,
+        Email = MaskEmail(u.Email),
+        // NE PAS inclure PasswordHash, Tokens, etc.
+    })
+    .WriteTo.Console(outputTemplate: 
+        "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+    .WriteTo.File(
+        path: "logs/app-.txt",
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 30,
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
+// Méthode utilitaire pour masquer les emails
+string MaskEmail(string email)
+{
+    if (string.IsNullOrEmpty(email)) return email;
+    var parts = email.Split('@');
+    if (parts.Length != 2) return email;
+    
+    var localPart = parts[0];
+    var maskedLocal = localPart.Length > 2 
+        ? $"{localPart[0]}***{localPart[^1]}" 
+        : "***";
+    
+    return $"{maskedLocal}@{parts[1]}";
+}
+
+// Exemple de logging sécurisé dans AuthController
+[HttpPost("login")]
+public async Task<IActionResult> Login([FromBody] LoginRequest request)
+{
+    try
+    {
+        // ❌ JAMAIS FAIRE CECI:
+        // _logger.LogInformation("Login attempt with password: {Password}", request.Password);
+        
+        // ✅ BON:
+        _logger.LogInformation("Login attempt for user: {Email}", MaskEmail(request.Email));
+
+        var result = await _authService.LoginAsync(request.Email, request.Password);
+        
+        if (!result.Success)
+        {
+            // Ne pas révéler si l'email existe ou non
+            _logger.LogWarning("Failed login attempt for: {Email}", MaskEmail(request.Email));
+            return Unauthorized(new { message = "Email ou mot de passe incorrect" });
+        }
+
+        // Ne pas logger les tokens
+        _logger.LogInformation("Successful login for user: {UserId}", result.UserId);
+        
+        return Ok(new { token = result.Token, refreshToken = result.RefreshToken });
+    }
+    catch (Exception ex)
+    {
+        // Logger l'exception sans détails sensibles
+        _logger.LogError(ex, "Error during login process");
+        return StatusCode(500, new { message = "Une erreur est survenue lors de la connexion" });
+    }
+}
+
+// Configuration des exclusions dans appsettings.json
+{
+  "Serilog": {
+    "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.File" ],
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": {
+        "Microsoft": "Warning",
+        "System": "Warning"
+      }
+    },
+    "Properties": {
+      "Application": "Print3DFinder"
+    },
+    "Destructure": [
+      {
+        "Name": "ToMaximumDepth",
+        "Args": { "maximumDestructuringDepth": 3 }
+      },
+      {
+        "Name": "ToMaximumStringLength",
+        "Args": { "maximumStringLength": 1000 }
+      }
+    ],
+    "Filter": [
+      {
+        "Name": "ByExcluding",
+        "Args": {
+          "expression": "@Properties['password'] is not null or @Properties['token'] is not null"
+        }
+      }
+    ]
+  }
+}
+```
+
+### 5.3 Gestion des Messages d'Erreur Explicites
+
+Messages d'erreur clairs et actionnables pour les utilisateurs :
+
+```csharp
+// Classe de réponse d'erreur standardisée
+public class ApiErrorResponse
+{
+    public string Message { get; set; }
+    public string ErrorCode { get; set; }
+    public Dictionary<string, string[]> ValidationErrors { get; set; }
+    public string TraceId { get; set; } // Pour support technique
+}
+
+// Middleware de gestion globale des erreurs
+public class ErrorHandlingMiddleware
+{
+    private readonly RequestDelegate _next;
+    private readonly ILogger<ErrorHandlingMiddleware> _logger;
+    private readonly IHostEnvironment _env;
+
+    public ErrorHandlingMiddleware(
+        RequestDelegate next,
+        ILogger<ErrorHandlingMiddleware> logger,
+        IHostEnvironment env)
+    {
+        _next = next;
+        _logger = logger;
+        _env = env;
+    }
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        try
+        {
+            await _next(context);
+        }
+        catch (Exception ex)
+        {
+            await HandleExceptionAsync(context, ex);
+        }
+    }
+
+    private async Task HandleExceptionAsync(HttpContext context, Exception exception)
+    {
+        var traceId = context.TraceIdentifier;
+        
+        // Log technique complet (sans credentials)
+        _logger.LogError(exception, 
+            "Unhandled exception occurred. TraceId: {TraceId}", traceId);
+
+        // Préparer la réponse pour l'utilisateur
+        var response = new ApiErrorResponse
+        {
+            TraceId = traceId
+        };
+
+        context.Response.ContentType = "application/json";
+
+        switch (exception)
+        {
+            case ValidationException validationEx:
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                response.Message = "Les données fournies sont invalides";
+                response.ErrorCode = "VALIDATION_ERROR";
+                response.ValidationErrors = validationEx.Errors
+                    .GroupBy(e => e.PropertyName)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.Select(e => e.ErrorMessage).ToArray()
+                    );
+                break;
+
+            case UnauthorizedAccessException:
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                response.Message = "Vous devez être connecté pour accéder à cette ressource";
+                response.ErrorCode = "UNAUTHORIZED";
+                break;
+
+            case NotFoundException notFoundEx:
+                context.Response.StatusCode = StatusCodes.Status404NotFound;
+                response.Message = $"La ressource demandée n'a pas été trouvée : {notFoundEx.ResourceName}";
+                response.ErrorCode = "NOT_FOUND";
+                break;
+
+            case InvalidOperationException invalidOpEx:
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                response.Message = GetUserFriendlyMessage(invalidOpEx);
+                response.ErrorCode = "INVALID_OPERATION";
+                break;
+
+            case DbUpdateException dbEx:
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                response.Message = "Une erreur est survenue lors de l'enregistrement des données. Veuillez réessayer.";
+                response.ErrorCode = "DATABASE_ERROR";
+                // Ne pas exposer les détails SQL à l'utilisateur
+                break;
+
+            default:
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                response.Message = "Une erreur temporaire s'est produite. Notre équipe a été notifiée. Veuillez réessayer dans quelques instants.";
+                response.ErrorCode = "INTERNAL_ERROR";
+                
+                if (_env.IsDevelopment())
+                {
+                    response.Message += $" Détails: {exception.Message}";
+                }
+                break;
+        }
+
+        await context.Response.WriteAsJsonAsync(response);
+    }
+
+    private string GetUserFriendlyMessage(InvalidOperationException ex)
+    {
+        // Mapper les messages techniques en messages utilisateur
+        return ex.Message switch
+        {
+            var msg when msg.Contains("duplicate key") => 
+                "Cette ressource existe déjà dans le système",
+            
+            var msg when msg.Contains("foreign key") => 
+                "Impossible de supprimer cette ressource car elle est utilisée ailleurs",
+            
+            var msg when msg.Contains("timeout") => 
+                "L'opération a pris trop de temps. Veuillez réessayer",
+            
+            _ => "L'opération demandée ne peut pas être effectuée actuellement"
+        };
+    }
+}
+
+// Exemple de validation avec messages explicites
+public class CreateOrderRequestValidator : AbstractValidator<CreateOrderRequest>
+{
+    public CreateOrderRequestValidator()
+    {
+        RuleFor(x => x.ModelId)
+            .NotEmpty()
+            .WithMessage("Vous devez sélectionner un modèle 3D à imprimer");
+
+        RuleFor(x => x.MaterialId)
+            .NotEmpty()
+            .WithMessage("Vous devez choisir un matériau d'impression");
+
+        RuleFor(x => x.Color)
+            .NotEmpty()
+            .WithMessage("Veuillez sélectionner une couleur")
+            .MaximumLength(50)
+            .WithMessage("Le nom de la couleur ne doit pas dépasser 50 caractères");
+
+        RuleFor(x => x.ShippingAddress)
+            .NotEmpty()
+            .WithMessage("L'adresse de livraison est obligatoire")
+            .MinimumLength(10)
+            .WithMessage("L'adresse de livraison doit contenir au moins 10 caractères")
+            .MaximumLength(500)
+            .WithMessage("L'adresse de livraison ne doit pas dépasser 500 caractères");
+    }
+}
+
+// Utilisation dans un controller
+[HttpPost]
+public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequest request)
+{
+    var validator = new CreateOrderRequestValidator();
+    var validationResult = await validator.ValidateAsync(request);
+
+    if (!validationResult.IsValid)
+    {
+        var errors = validationResult.Errors
+            .GroupBy(e => e.PropertyName)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(e => e.ErrorMessage).ToArray()
+            );
+
+        return BadRequest(new ApiErrorResponse
+        {
+            Message = "Les données de la commande sont invalides",
+            ErrorCode = "VALIDATION_ERROR",
+            ValidationErrors = errors,
+            TraceId = HttpContext.TraceIdentifier
+        });
+    }
+
+    // Traiter la commande...
+}
+```
 
 ### 6.1 Tests Unitaires
 

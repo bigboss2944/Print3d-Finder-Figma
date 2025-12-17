@@ -80,8 +80,10 @@ Ce document se concentre principalement sur la phase 1 (Application Web), avec d
 
 ### 2.3 Visualisation des Modèles 3D
 
+**Note Version 1** : La visualisation 3D interactive n'est pas incluse dans la version 1 de l'application. Cependant, les considérations techniques et matérielles pour son développement futur sont prises en compte dans l'architecture.
+
 #### 2.3.1 Galerie de Résultats
-- Affichage en grille avec miniatures
+- Affichage en grille avec miniatures (images statiques)
 - Vue liste alternative
 - Pagination ou scroll infini
 - Tri par :
@@ -92,11 +94,21 @@ Ce document se concentre principalement sur la phase 1 (Application Web), avec d
   - Prix d'impression estimé
 
 #### 2.3.2 Page de Détails du Modèle
-- **Visualisation 3D interactive** :
+- **Visualisation du modèle (Version 1)** :
+  - Images statiques du modèle (multiples angles)
+  - Visualisation des dimensions en format texte
+  - Aperçu 2D du modèle
+
+- **Visualisation 3D interactive (Version 2 - Développement ultérieur)** :
   - Rotation 360° du modèle
   - Zoom avant/arrière
-  - Visualisation des dimensions
   - Affichage en mode wireframe optionnel
+  - **Considérations architecturales** :
+    - Support navigateur : WebGL 2.0 requis
+    - Librairie recommandée : Three.js ou Babylon.js
+    - Format de fichiers optimisé : glTF 2.0 pour le web
+    - Hébergement des modèles : CDN pour performance
+    - Limitations : Taille max 10MB par modèle pour rendu web
 
 - **Informations du modèle** :
   - Nom et description
@@ -355,6 +367,12 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
   - Droit à l'oubli implémenté
   - Logs d'accès et de modifications
   - Durée de conservation limitée
+- **Sécurité des logs** :
+  - **Les credentials (mots de passe, tokens, clés API) ne doivent JAMAIS apparaître dans les logs**
+  - Filtrage automatique des données sensibles avant logging
+  - Masquage des informations personnelles (emails partiels, ex: u***@example.com)
+  - Logs des échecs d'authentification sans détails sensibles
+  - Rotation et archivage sécurisé des logs
 
 #### 3.3.3 Validation et Sanitisation
 - **Validation des entrées** :
@@ -454,6 +472,44 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
 - Tests d'intégration
 - CI/CD avec GitHub Actions ou Azure DevOps
 - Déploiement automatisé
+
+### 4.6 Expérience Utilisateur (UX)
+
+#### 4.6.1 Messages d'Erreur
+Les messages d'erreur doivent être **suffisamment explicites** pour guider l'utilisateur :
+
+- **Messages clairs et actionnables** :
+  - ❌ Mauvais : "Erreur 500"
+  - ✅ Bon : "Impossible de traiter votre demande. Veuillez réessayer dans quelques instants."
+  
+  - ❌ Mauvais : "Validation failed"
+  - ✅ Bon : "Le mot de passe doit contenir au moins 8 caractères, une majuscule, un chiffre et un caractère spécial."
+
+- **Catégories de messages** :
+  - **Erreurs de validation** : Indiquer précisément quel champ est incorrect et pourquoi
+    - Ex: "L'adresse email n'est pas valide. Veuillez vérifier le format (exemple@domaine.com)"
+  
+  - **Erreurs d'authentification** : 
+    - Ex: "Email ou mot de passe incorrect. Veuillez vérifier vos identifiants."
+    - Lien vers récupération de mot de passe si applicable
+  
+  - **Erreurs de fichier** :
+    - Ex: "Le fichier est trop volumineux (15 MB). La taille maximale autorisée est de 10 MB."
+    - Ex: "Format de fichier non supporté. Formats acceptés : JPG, PNG, HEIC"
+  
+  - **Erreurs serveur** :
+    - Ex: "Une erreur temporaire s'est produite. Notre équipe a été notifiée. Veuillez réessayer."
+    - Référence d'erreur pour support : "Réf: ERR-2024-XXXXX"
+  
+  - **Erreurs de connexion** :
+    - Ex: "Impossible de se connecter au serveur. Vérifiez votre connexion internet."
+
+- **Bonnes pratiques** :
+  - Éviter le jargon technique pour l'utilisateur final
+  - Proposer une solution ou action corrective
+  - Utiliser un ton empathique et non accusateur
+  - Logger les détails techniques en backend (sans exposer de données sensibles)
+  - Afficher une icône appropriée (⚠️ avertissement, ❌ erreur, ℹ️ information)
 
 ## 5. Workflow Utilisateur Complet
 
@@ -650,11 +706,13 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
 - ✅ Noms d'utilisateurs chiffrés en base de données
 - ✅ Recherche textuelle avec résultats pertinents (< 500ms)
 - ✅ Recherche par photo opérationnelle (< 3s)
-- ✅ Visualisation 3D interactive
+- ✅ Visualisation de modèles avec images statiques multiples (Version 1)
+- ⏳ Visualisation 3D interactive (Version 2 - développement ultérieur)
 - ✅ Analyse de printabilité automatique (< 10s)
 - ✅ Workflow de commande complet
 - ✅ **Notifications email automatiques à l'imprimeur pour chaque nouvelle commande**
 - ✅ Notifications par email aux utilisateurs
+- ✅ **Messages d'erreur explicites et actionnables**
 - ✅ Tableau de bord admin avec toutes fonctionnalités
 - ✅ Application web Blazor .NET 10 déployée
 
@@ -673,6 +731,7 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
 
 ### 10.3 Sécurité
 - ✅ **Connexion HTTPS/TLS 1.3 obligatoire pour toutes les communications**
+- ✅ **Aucun credential (mot de passe, token, clé API) dans les logs**
 - ✅ Audit de sécurité passé sans faille critique
 - ✅ Tests de pénétration validés
 - ✅ Certificat SSL/TLS valide installé
@@ -682,6 +741,7 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
 - ✅ Tokens JWT avec expiration
 - ✅ Rate limiting configuré
 - ✅ Scan antivirus sur uploads
+- ✅ Filtrage automatique des données sensibles dans les logs
 
 ## 11. Maintenance et Évolutions Futures
 

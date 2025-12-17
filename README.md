@@ -49,6 +49,7 @@ Fournir une solution complète permettant aux utilisateurs de :
 
 - ✅ **Connexion HTTPS obligatoire** (TLS 1.3) pour toutes les communications
 - ✅ **Noms d'utilisateurs sécurisés** (chiffrement et hachage en base de données)
+- ✅ **Aucun credential dans les logs** (mots de passe, tokens, clés API filtrés)
 - ✅ Authentification JWT avec tokens d'expiration
 - ✅ Hashage des mots de passe avec bcrypt/Argon2id
 - ✅ Certificat SSL/TLS valide et HSTS activé
@@ -74,11 +75,13 @@ Pour les spécifications complètes du projet, consultez le **[Cahier des Charge
 - 🔐 Inscription et connexion sécurisées
 - 🔍 Recherche textuelle avec auto-complétion
 - 📷 Recherche par photo (upload ou capture)
-- 👀 Visualisation 3D interactive des modèles
+- 🖼️ Visualisation de modèles avec images multiples (Version 1)
+- 🎨 Visualisation 3D interactive (Version 2 - future)
 - 📊 Analyse automatique de printabilité
 - ⚙️ Configuration personnalisée (matériau, couleur, qualité)
 - 🛒 Commande et suivi d'impression
 - 📧 Notifications email
+- ✅ Messages d'erreur clairs et explicites
 - 📜 Historique des commandes
 - ⭐ Évaluation et avis
 
