@@ -1,2 +1,193 @@
-# Print3d-Finder-Figma
-Print3d-Finder-Figma
+# Print3D Finder
+
+**Plateforme de recherche et d'impression de modèles 3D**
+
+## 📋 Description
+
+Print3D Finder est une application web et mobile permettant aux utilisateurs de rechercher des modèles 3D à imprimer via :
+- 🔍 **Recherche textuelle** intelligente avec filtres avancés
+- 📸 **Recherche par photo** grâce à l'intelligence artificielle
+- 🔬 **Analyse automatique** de la printabilité des modèles
+- 🖨️ **Service d'impression** professionnel intégré
+
+## 🎯 Objectifs
+
+Fournir une solution complète permettant aux utilisateurs de :
+1. Rechercher facilement des modèles 3D sur internet
+2. Analyser la compatibilité d'impression (matériaux, dimensions, complexité)
+3. Commander l'impression de modèles auprès d'un service professionnel
+4. Suivre leurs commandes en temps réel
+
+## 🛠️ Technologies
+
+### Application Web
+- **Framework**: Blazor Server/WebAssembly (.NET 10)
+- **Langage**: C# 12
+- **UI**: Tailwind CSS / MudBlazor
+- **Authentification**: ASP.NET Core Identity + JWT
+
+### Application Mobile
+- **Framework**: .NET MAUI (.NET 10)
+- **Plateformes**: Android 7.0+ (API 24+), iOS 13+
+- **Interface**: XAML + MAUI Community Toolkit
+
+### Backend
+- **API**: ASP.NET Core Web API (.NET 10)
+- **Base de données**: PostgreSQL 16+ / SQL Server 2022
+- **ORM**: Entity Framework Core 10
+- **Stockage fichiers**: Azure Blob Storage / AWS S3
+- **Recherche**: Elasticsearch / Azure Cognitive Search
+- **IA Vision**: Azure Computer Vision / Google Cloud Vision API
+
+## 🔐 Sécurité
+
+- ✅ **Noms d'utilisateurs sécurisés** (chiffrement et hachage en base de données)
+- ✅ Authentification JWT avec tokens d'expiration
+- ✅ Hashage des mots de passe avec bcrypt/Argon2id
+- ✅ Chiffrement TLS 1.3 pour toutes les communications
+- ✅ Protection contre SQL Injection, XSS, CSRF
+- ✅ Conformité RGPD (droit à l'oubli, export de données)
+- ✅ Rate limiting et protection DDoS
+- ✅ Scan antivirus sur uploads de fichiers
+
+## 📚 Documentation
+
+Pour les spécifications complètes du projet, consultez le **[Cahier des Charges](./CAHIER_DES_CHARGES.md)** qui inclut :
+- Spécifications fonctionnelles détaillées
+- Architecture technique complète
+- Exigences de sécurité
+- Workflow utilisateur
+- Planning et jalons du projet
+- Budget prévisionnel
+- Critères d'acceptation
+
+## 🚀 Fonctionnalités Principales
+
+### Pour les Utilisateurs
+- 🔐 Inscription et connexion sécurisées
+- 🔍 Recherche textuelle avec auto-complétion
+- 📷 Recherche par photo (upload ou capture)
+- 👀 Visualisation 3D interactive des modèles
+- 📊 Analyse automatique de printabilité
+- ⚙️ Configuration personnalisée (matériau, couleur, qualité)
+- 🛒 Commande et suivi d'impression
+- 📧 Notifications email et push
+- 📜 Historique des commandes
+- ⭐ Évaluation et avis
+
+### Pour les Administrateurs
+- 📊 Tableau de bord avec statistiques
+- 📦 Gestion des commandes en temps réel
+- 🎨 Gestion des modèles 3D
+- 👥 Gestion des utilisateurs
+- 📈 Rapports et analytics
+
+## 🗺️ Roadmap
+
+### ✅ Phase 1 : Prototype UI (Actuel - React/Vite)
+- Interface de recherche
+- Visualisation des résultats
+- Pages de détails et commande
+- Authentification basique
+
+### 🔨 Phase 2 : Migration Blazor .NET 10
+- Migration complète vers Blazor
+- Implémentation backend ASP.NET Core
+- Intégration base de données
+- Authentification JWT sécurisée
+
+### 📱 Phase 3 : Application Mobile MAUI
+- Application native Android/iOS
+- Intégration caméra pour recherche photo
+- Notifications push
+- Synchronisation avec backend
+
+### 🤖 Phase 4 : Intelligence Artificielle
+- Recherche par image avancée
+- Analyse automatique de modèles 3D
+- Recommandations personnalisées
+
+### 🌟 Phase 5 : Fonctionnalités Avancées
+- Upload de modèles par utilisateurs
+- Marketplace de modèles
+- Configurateur 3D avancé
+- Réalité Augmentée (AR)
+
+## 💻 Développement Local (Prototype React Actuel)
+
+### Prérequis
+- Node.js 18+
+- npm ou yarn
+
+### Installation
+
+```bash
+# Cloner le repository
+git clone https://github.com/bigboss2944/Print3d-Finder-Figma.git
+cd Print3d-Finder-Figma
+
+# Installer les dépendances
+npm install
+
+# Lancer le serveur de développement
+npm run dev
+
+# Build pour production
+npm run build
+```
+
+### Accès
+- L'application sera disponible sur `http://localhost:5173`
+- Utilisez un email contenant "admin" pour accéder au tableau de bord administrateur
+
+## 📦 Structure du Projet (Prototype Actuel)
+
+```
+Print3d-Finder-Figma/
+├── src/
+│   ├── components/           # Composants React
+│   │   ├── SearchPage.tsx    # Page de recherche
+│   │   ├── SearchResults.tsx # Résultats de recherche
+│   │   ├── ModelDetails.tsx  # Détails du modèle
+│   │   ├── PrintRequest.tsx  # Demande d'impression
+│   │   ├── LoginPage.tsx     # Authentification
+│   │   ├── UserProfile.tsx   # Profil utilisateur
+│   │   ├── AdminDashboard.tsx # Tableau de bord admin
+│   │   └── ui/               # Composants UI réutilisables
+│   ├── App.tsx               # Composant principal
+│   ├── main.tsx              # Point d'entrée
+│   └── index.css             # Styles globaux
+├── public/                   # Assets statiques
+├── CAHIER_DES_CHARGES.md     # Spécifications complètes
+├── package.json              # Dépendances npm
+└── vite.config.ts            # Configuration Vite
+```
+
+## 🤝 Contribution
+
+Les contributions sont les bienvenues ! Pour contribuer :
+
+1. Forkez le projet
+2. Créez une branche pour votre fonctionnalité (`git checkout -b feature/AmazingFeature`)
+3. Committez vos changements (`git commit -m 'Add some AmazingFeature'`)
+4. Pushez vers la branche (`git push origin feature/AmazingFeature`)
+5. Ouvrez une Pull Request
+
+## 📄 Licence
+
+Ce projet utilise des composants de :
+- [shadcn/ui](https://ui.shadcn.com/) sous [licence MIT](https://github.com/shadcn-ui/ui/blob/main/LICENSE.md)
+- Photos de [Unsplash](https://unsplash.com) sous [licence Unsplash](https://unsplash.com/license)
+
+## 📞 Contact
+
+Pour toute question concernant le projet :
+- 📧 Email : [Créer une issue](https://github.com/bigboss2944/Print3d-Finder-Figma/issues)
+- 🐛 Bugs : [Signaler un bug](https://github.com/bigboss2944/Print3d-Finder-Figma/issues)
+- 💡 Suggestions : [Proposer une fonctionnalité](https://github.com/bigboss2944/Print3d-Finder-Figma/issues)
+
+---
+
+**Version**: 1.0.0  
+**Statut**: Prototype React → Migration vers Blazor .NET 10 & MAUI planifiée  
+**Dernière mise à jour**: Décembre 2025
