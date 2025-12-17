@@ -133,9 +133,12 @@ Pour les spécifications complètes du projet, consultez le **[Cahier des Charge
 
 ## 👨‍💻 Contexte de Développement
 
-Ce projet est développé par un **développeur solo**, avec une approche progressive :
+Ce projet est développé par un **développeur solo en temps partiel**, avec une approche progressive :
 1. **Priorité** : Application web complète et fonctionnelle
-2. **Ensuite** : Application mobile une fois le web stabilisé
+2. **Planning** : 12-15 mois (développement temps partiel ~50%)
+3. **Packages** : Uniquement open-source et maintenus activement
+4. **Images** : Libres de droits (Unsplash, Pexels, Pixabay)
+5. **Ensuite** : Application mobile une fois le web stabilisé
 - Intégration caméra pour recherche photo
 - Notifications push
 - Synchronisation avec backend

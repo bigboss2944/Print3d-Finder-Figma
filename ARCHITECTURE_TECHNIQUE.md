@@ -834,7 +834,212 @@ public class ImageSearchService : IImageSearchService
 }
 ```
 
-#### 2.4.2 Service d'Analyse de Modèles 3D
+#### 2.4.2 Service de Compression d'Images
+
+**Toutes les images uploadées doivent être automatiquement compressées** pour optimiser le stockage et les performances.
+
+```csharp
+public interface IImageCompressionService
+{
+    Task<CompressedImageResult> CompressImageAsync(Stream imageStream, string originalFileName);
+    Task<CompressedImageResult> CompressAndResizeAsync(Stream imageStream, string originalFileName, ImageSize[] sizes);
+}
+
+public class ImageCompressionService : IImageCompressionService
+{
+    private readonly ILogger<ImageCompressionService> _logger;
+    private readonly IBlobStorageService _blobStorage;
+
+    public ImageCompressionService(
+        ILogger<ImageCompressionService> logger,
+        IBlobStorageService blobStorage)
+    {
+        _logger = logger;
+        _blobStorage = blobStorage;
+    }
+
+    /// <summary>
+    /// Compresse une image et génère plusieurs résolutions
+    /// </summary>
+    public async Task<CompressedImageResult> CompressAndResizeAsync(
+        Stream imageStream, 
+        string originalFileName, 
+        ImageSize[] sizes)
+    {
+        try
+        {
+            using var image = await Image.LoadAsync(imageStream);
+            
+            var result = new CompressedImageResult
+            {
+                OriginalFileName = originalFileName,
+                OriginalSize = imageStream.Length,
+                Versions = new List<ImageVersion>()
+            };
+
+            foreach (var size in sizes)
+            {
+                var resizedImage = image.Clone(ctx =>
+                {
+                    // Redimensionner si l'image est plus grande que la taille cible
+                    if (image.Width > size.MaxWidth || image.Height > size.MaxHeight)
+                    {
+                        ctx.Resize(new ResizeOptions
+                        {
+                            Size = new Size(size.MaxWidth, size.MaxHeight),
+                            Mode = ResizeMode.Max,
+                            Sampler = KnownResamplers.Lanczos3
+                        });
+                    }
+                });
+
+                // Compression en WebP (format optimal)
+                var webpStream = new MemoryStream();
+                await resizedImage.SaveAsWebpAsync(webpStream, new WebpEncoder
+                {
+                    Quality = size.Quality,
+                    FileFormat = WebpFileFormatType.Lossy
+                });
+                webpStream.Position = 0;
+
+                var webpUrl = await _blobStorage.UploadAsync(
+                    webpStream, 
+                    $"{Guid.NewGuid()}.webp", 
+                    "image/webp");
+
+                // Fallback JPG pour compatibilité navigateurs anciens
+                var jpgStream = new MemoryStream();
+                await resizedImage.SaveAsJpegAsync(jpgStream, new JpegEncoder
+                {
+                    Quality = size.Quality
+                });
+                jpgStream.Position = 0;
+
+                var jpgUrl = await _blobStorage.UploadAsync(
+                    jpgStream, 
+                    $"{Guid.NewGuid()}.jpg", 
+                    "image/jpeg");
+
+                result.Versions.Add(new ImageVersion
+                {
+                    Type = size.Type,
+                    Width = resizedImage.Width,
+                    Height = resizedImage.Height,
+                    WebPUrl = webpUrl,
+                    JpegUrl = jpgUrl,
+                    CompressedSize = webpStream.Length
+                });
+
+                _logger.LogInformation(
+                    "Image compressed: {Type}, Original: {OriginalSize}KB, WebP: {CompressedSize}KB, " +
+                    "Compression ratio: {Ratio}%",
+                    size.Type,
+                    imageStream.Length / 1024,
+                    webpStream.Length / 1024,
+                    ((1 - (double)webpStream.Length / imageStream.Length) * 100).ToString("F1"));
+            }
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error compressing image {FileName}", originalFileName);
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Compression simple sans redimensionnement
+    /// </summary>
+    public async Task<CompressedImageResult> CompressImageAsync(Stream imageStream, string originalFileName)
+    {
+        var sizes = new[]
+        {
+            new ImageSize { Type = "original", MaxWidth = 2048, MaxHeight = 2048, Quality = 80 }
+        };
+
+        return await CompressAndResizeAsync(imageStream, originalFileName, sizes);
+    }
+}
+
+// DTOs pour la compression
+public class CompressedImageResult
+{
+    public string OriginalFileName { get; set; }
+    public long OriginalSize { get; set; }
+    public List<ImageVersion> Versions { get; set; }
+}
+
+public class ImageVersion
+{
+    public string Type { get; set; } // "thumbnail", "preview", "full"
+    public int Width { get; set; }
+    public int Height { get; set; }
+    public string WebPUrl { get; set; }
+    public string JpegUrl { get; set; }
+    public long CompressedSize { get; set; }
+}
+
+public class ImageSize
+{
+    public string Type { get; set; }
+    public int MaxWidth { get; set; }
+    public int MaxHeight { get; set; }
+    public int Quality { get; set; } // 0-100
+}
+
+// Utilisation dans le controller
+[HttpPost("upload")]
+[RequestSizeLimit(10_485_760)] // 10 MB
+public async Task<IActionResult> UploadImage([FromForm] IFormFile image)
+{
+    if (image == null || image.Length == 0)
+        return BadRequest("Image is required");
+
+    try
+    {
+        using var stream = image.OpenReadStream();
+        
+        // Définir les tailles nécessaires
+        var sizes = new[]
+        {
+            new ImageSize { Type = "thumbnail", MaxWidth = 200, MaxHeight = 200, Quality = 70 },
+            new ImageSize { Type = "preview", MaxWidth = 800, MaxHeight = 800, Quality = 80 },
+            new ImageSize { Type = "full", MaxWidth = 2048, MaxHeight = 2048, Quality = 85 }
+        };
+
+        var result = await _imageCompressionService.CompressAndResizeAsync(
+            stream, 
+            image.FileName, 
+            sizes);
+
+        return Ok(new
+        {
+            message = "Image uploaded and compressed successfully",
+            originalSize = $"{result.OriginalSize / 1024}KB",
+            versions = result.Versions.Select(v => new
+            {
+                type = v.Type,
+                size = $"{v.Width}x{v.Height}",
+                webpUrl = v.WebPUrl,
+                jpegUrl = v.JpegUrl,
+                compressedSize = $"{v.CompressedSize / 1024}KB"
+            })
+        });
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error uploading image");
+        return StatusCode(500, new { message = "Erreur lors de l'upload de l'image" });
+    }
+}
+
+// Configuration des packages NuGet requis
+// <PackageReference Include="SixLabors.ImageSharp" Version="3.0.0" />
+// <PackageReference Include="SixLabors.ImageSharp.Web" Version="3.0.0" />
+```
+
+#### 2.4.3 Service d'Analyse de Modèles 3D
 
 ```csharp
 public class Model3DAnalyzer

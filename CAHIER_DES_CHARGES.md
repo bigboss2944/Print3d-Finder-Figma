@@ -70,7 +70,13 @@ Ce document se concentre principalement sur la phase 1 (Application Web), avec d
   - Upload depuis la galerie (mobile) ou explorateur de fichiers (web)
   - Prise de photo directe (mobile uniquement)
   - Formats acceptés : JPG, PNG, HEIC
-  - Taille maximale : 10 MB
+  - Taille maximale : 10 MB (avant compression)
+  - **Compression automatique des images** :
+    - Compression côté serveur après upload
+    - Format de sortie : WebP (fallback JPG pour compatibilité)
+    - Qualité ajustée selon usage (recherche: 80%, miniatures: 70%)
+    - Réduction automatique si > 2048px sur le côté le plus long
+    - Optimisation pour réduire la bande passante et le stockage
   
 - **Reconnaissance visuelle** :
   - Analyse d'image par IA pour identifier l'objet
@@ -270,6 +276,36 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
 
 ### 3.1 Architecture Globale
 
+#### 3.1.0 Politique de Dépendances et Ressources
+
+**Packages et Librairies** :
+- **Tous les packages utilisés doivent être open-source et activement maintenus**
+- Critères de sélection :
+  - Licence permissive (MIT, Apache 2.0, BSD)
+  - Maintenance active (commits récents, issues résolues)
+  - Communauté active et documentation complète
+  - Support de .NET 10
+  - Audit de sécurité régulier (pas de vulnérabilités connues)
+- Exemples de packages approuvés :
+  - **Frontend** : MudBlazor (MIT), Tailwind CSS (MIT)
+  - **Backend** : Serilog (Apache 2.0), FluentValidation (Apache 2.0)
+  - **Images** : ImageSharp (Apache 2.0), SkiaSharp (MIT)
+  - **Tests** : xUnit (Apache 2.0), Moq (BSD)
+  - **Base de données** : Entity Framework Core (MIT), Npgsql (PostgreSQL License)
+
+**Images et Ressources Visuelles** :
+- **Toutes les images utilisées doivent être libres de droits**
+- Sources autorisées :
+  - Unsplash (licence Unsplash - usage commercial autorisé)
+  - Pexels (licence Pexels - usage commercial autorisé)
+  - Pixabay (licence Pixabay - usage commercial autorisé)
+  - Icons8 (gratuit avec attribution ou licence payante)
+  - FontAwesome Free (licence CC BY 4.0 pour icons)
+  - Illustrations générées par IA (MidJourney, DALL-E avec licence commerciale)
+- **Attribution requise** selon la licence utilisée
+- Pas d'images issues de sites payants sans licence appropriée
+- Vérification systématique de la licence avant utilisation
+
 #### 3.1.1 Application Web
 - **Framework** : Blazor Server ou Blazor WebAssembly (.NET 10)
 - **Langage** : C# 12
@@ -389,8 +425,14 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
 - **Validation** :
   - Vérification du type MIME
   - Scan antivirus des fichiers uploadés
-  - Taille maximale : 50 MB pour modèles 3D, 10 MB pour images
+  - Taille maximale : 50 MB pour modèles 3D, 10 MB pour images (avant compression)
   - Formats autorisés uniquement
+- **Compression automatique des images** :
+  - Compression côté serveur immédiatement après upload
+  - Librairie recommandée : ImageSharp ou SkiaSharp
+  - Conversion en WebP pour stockage optimal (avec fallback JPG)
+  - Génération de multiples résolutions (thumbnails, preview, full)
+  - Conservation EXIF minimale (sans données GPS sensibles)
 - **Isolation** :
   - Stockage séparé du serveur web
   - Noms de fichiers aléatoires (GUID)
@@ -466,12 +508,47 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
 - Contrastes de couleurs adaptés
 - Taille de texte ajustable
 
-### 4.5 Maintenabilité
-- Code commenté et documenté
-- Tests unitaires (couverture > 70%)
-- Tests d'intégration
+### 4.5 Maintenabilité et Qualité du Code
+
+#### 4.5.1 Approche Test-Driven Development (TDD)
+**Le projet suit une approche TDD** : les tests sont écrits tout au long du développement, pas seulement à la fin.
+
+- **Cycle TDD** :
+  1. **Red** : Écrire un test qui échoue
+  2. **Green** : Écrire le code minimal pour faire passer le test
+  3. **Refactor** : Améliorer le code tout en gardant les tests verts
+
+- **Tests unitaires** :
+  - Couverture minimale : 70%
+  - Objectif : 80%+
+  - Écrits avant ou en parallèle du code de production
+  - Outils : xUnit, NUnit ou MSTest pour .NET
+  - Mocking : Moq ou NSubstitute
+  - Tests rapides (< 100ms par test)
+
+- **Tests d'intégration** :
+  - Tests des interactions entre composants
+  - Tests des API endpoints
+  - Tests de la base de données (avec DB en mémoire ou conteneur)
+  - Tests des services externes (avec mocks ou stubs)
+
+- **Tests end-to-end** :
+  - Tests de scénarios utilisateur complets
+  - Outils : Playwright ou Selenium pour Blazor
+  - Tests critiques du parcours utilisateur
+
+#### 4.5.2 Qualité et Documentation
+- Code commenté et documenté (XML comments pour API publiques)
+- Revues de code systématiques
+- Analyse statique du code (Roslyn analyzers, SonarQube)
 - CI/CD avec GitHub Actions ou Azure DevOps
 - Déploiement automatisé
+- Pipeline CI incluant :
+  - Compilation
+  - Exécution de tous les tests
+  - Analyse de couverture de code
+  - Analyse de sécurité (SAST)
+  - Validation avant merge
 
 ### 4.6 Expérience Utilisateur (UX)
 
@@ -585,10 +662,12 @@ Les messages d'erreur doivent être **suffisamment explicites** pour guider l'ut
 - ✅ Procédures de maintenance
 
 ### 6.3 Tests
-- ✅ Tests unitaires (backend)
-- ✅ Tests d'intégration (API)
+- ✅ Tests unitaires (backend) - **Développés en TDD tout au long du projet**
+- ✅ Tests d'intégration (API) - **Approche TDD**
 - ✅ Tests end-to-end (UI)
-- ✅ Rapports de tests
+- ✅ Couverture de code > 70% (objectif 80%+)
+- ✅ Rapports de tests automatisés
+- ✅ Tests exécutés à chaque commit (CI/CD)
 
 ### 6.4 Sécurité
 - ✅ Audit de sécurité
@@ -597,43 +676,60 @@ Les messages d'erreur doivent être **suffisamment explicites** pour guider l'ut
 
 ## 7. Planning et Jalons
 
-### Phase 1 : Conception et Préparation (4 semaines)
+**Note importante** : Les durées indiquées sont en **semaines de travail effectives**. 
+Le développeur travaillant **en temps partiel** (~50% du temps), les durées calendaires réelles seront approximativement **doublées**.
+
+### Phase 1 : Conception et Préparation
+- **Durée** : 4 semaines effectives (≈ 8-10 semaines calendaires)
 - Finalisation du cahier des charges
-- Design UI/UX (maquettes)
+- Design UI/UX (maquettes) avec images libres de droits
 - Architecture technique détaillée
+- Sélection des packages open-source maintenus
 - Configuration de l'environnement de développement
 
-### Phase 2 : Développement Backend (8 semaines)
+### Phase 2 : Développement Backend
+- **Durée** : 8 semaines effectives (≈ 16-20 semaines calendaires)
 - API REST avec authentification HTTPS/TLS 1.3
 - Gestion des utilisateurs (sécurité des noms)
 - Moteur de recherche textuelle
 - Intégration recherche par image (IA)
+- Compression automatique des images
 - Analyse de modèles 3D
 - Gestion des commandes
 - **Système de notification email pour l'imprimeur**
+- Tests unitaires en TDD tout au long du développement
 
-### Phase 3 : Développement Frontend Web (6 semaines)
-- Application Blazor (.NET 10)
+### Phase 3 : Développement Frontend Web
+- **Durée** : 6 semaines effectives (≈ 12-15 semaines calendaires)
+- Application Blazor (.NET 10) avec packages open-source (MudBlazor/Tailwind CSS)
 - Pages d'authentification (connexion HTTPS)
 - Interface de recherche (texte + photo)
-- Visualisation 3D des modèles
+- Affichage avec images libres de droits (Unsplash, Pexels)
 - Workflow de commande
 - Tableau de bord utilisateur
 - Panneau administrateur
+- Tests end-to-end
 
-### Phase 4 : Tests et Optimisations (4 semaines)
-- Tests unitaires et d'intégration
+### Phase 4 : Tests et Optimisations
+- **Durée** : 4 semaines effectives (≈ 8-10 semaines calendaires)
+- Tests unitaires et d'intégration (complétion de la couverture)
 - Tests de charge et performance
-- Tests de sécurité (HTTPS, authentification)
+- Tests de sécurité (HTTPS, authentification, logs)
 - Corrections de bugs
 - Optimisations
+- Vérification licences des packages
 
-### Phase 5 : Déploiement et Lancement (2 semaines)
+### Phase 5 : Déploiement et Lancement
+- **Durée** : 2 semaines effectives (≈ 4-5 semaines calendaires)
 - Déploiement en production avec HTTPS
 - Configuration CDN et monitoring
 - Configuration des emails de notification
 - Lancement beta
 - Collecte de feedback
+
+**Durée totale Phase 1-5** : 
+- **24 semaines effectives** de travail
+- **48-60 semaines calendaires** (environ 12-15 mois) en temps partiel
 
 ### Phase 6 : Développement Mobile (6 semaines) - **Phase ultérieure**
 **Cette phase sera développée après la mise en production de l'application web**
@@ -647,17 +743,25 @@ Les messages d'erreur doivent être **suffisamment explicites** pour guider l'ut
 ## 8. Budget Prévisionnel
 
 ### 8.1 Ressources Humaines
-**Développement Solo** :
-- Développeur Full-Stack .NET : 24 semaines (Phase 1-5)
+**Développement Solo avec Temps Partiel** :
+
+Le développeur travaillera **en temps partiel** sur ce projet, alternant avec d'autres responsabilités.
+
+- **Estimation à temps plein** : 24 semaines (Phase 1-5)
   - Backend API (.NET 10) : 8 semaines
   - Frontend Blazor : 6 semaines
   - Conception et design : 4 semaines
   - Tests et déploiement : 6 semaines
 
-**Phase Mobile ultérieure** :
-- Développeur Mobile MAUI : 6 semaines supplémentaires
+- **Estimation réaliste (temps partiel ~50%)** : **48-60 semaines (environ 12-15 mois)**
+  - Variations selon disponibilité du développeur
+  - Buffer pour périodes de charge de travail élevée
+  - Flexibilité nécessaire dans le planning
 
-**Note** : Les estimations sont basées sur un développement à temps plein. Le projet étant réalisé par un seul développeur, les phases peuvent être ajustées selon la disponibilité.
+**Phase Mobile ultérieure** :
+- Développeur Mobile MAUI : 6 semaines temps plein (12-15 semaines temps partiel)
+
+**Note importante** : Le calendrier est flexible et s'adapte à la disponibilité du développeur. Il est recommandé de travailler par sprints courts (1-2 semaines) pour maintenir la progression régulière même en temps partiel.
 
 ### 8.2 Infrastructure (mensuel)
 - Hébergement Cloud (Azure/AWS) : 200-500€
@@ -708,6 +812,7 @@ Les messages d'erreur doivent être **suffisamment explicites** pour guider l'ut
 - ✅ Recherche par photo opérationnelle (< 3s)
 - ✅ Visualisation de modèles avec images statiques multiples (Version 1)
 - ⏳ Visualisation 3D interactive (Version 2 - développement ultérieur)
+- ✅ **Compression automatique des images uploadées** (WebP + JPG fallback)
 - ✅ Analyse de printabilité automatique (< 10s)
 - ✅ Workflow de commande complet
 - ✅ **Notifications email automatiques à l'imprimeur pour chaque nouvelle commande**
@@ -726,8 +831,12 @@ Les messages d'erreur doivent être **suffisamment explicites** pour guider l'ut
 - ✅ Uptime 99.9%
 - ✅ Conformité RGPD complète
 - ✅ Accessibilité WCAG 2.1 AA
-- ✅ Couverture de tests > 70%
+- ✅ **Approche TDD : Tests écrits tout au long du développement**
+- ✅ Couverture de tests > 70% (objectif 80%+)
+- ✅ **Tous les packages utilisés sont open-source et maintenus activement**
+- ✅ **Toutes les images sont libres de droits** (Unsplash, Pexels, Pixabay)
 - ✅ Documentation complète livrée
+- ✅ Planning adapté au développement en temps partiel
 
 ### 10.3 Sécurité
 - ✅ **Connexion HTTPS/TLS 1.3 obligatoire pour toutes les communications**
