@@ -64,8 +64,24 @@ Pour les spécifications complètes du projet, consultez le **[Cahier des Charge
 - Spécifications fonctionnelles détaillées
 - Architecture technique complète
 - Exigences de sécurité
+- **Standards de qualité du code** (conventions, analyse statique, métriques)
 - Workflow utilisateur
 - Planning et jalons du projet
+- Budget prévisionnel
+- Critères d'acceptation
+
+## 🎯 Qualité du Code
+
+Le projet respecte des **standards de qualité stricts** :
+- ✅ **Conventions Microsoft C# / .NET** (PascalCase, camelCase, SOLID)
+- ✅ **Test-Driven Development (TDD)** avec couverture > 70%
+- ✅ **Analyse statique** : StyleCop, Roslyn Analyzers, SonarQube
+- ✅ **Métriques SonarQube** : Note A ou B minimum
+- ✅ **Complexité cyclomatique** < 10 par méthode
+- ✅ **Duplication de code** < 3%
+- ✅ **Documentation XML** pour toutes les API publiques
+- ✅ **Revues de code** systématiques avec checklist
+- ✅ **CI/CD** avec tests automatiques et quality gates
 - Budget prévisionnel
 - Critères d'acceptation
 

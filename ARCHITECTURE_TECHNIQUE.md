@@ -2261,6 +2261,423 @@ public class ModelsControllerIntegrationTests : IClassFixture<WebApplicationFact
 }
 ```
 
+## 7. Standards de Qualité du Code
+
+### 7.1 Configuration .editorconfig
+
+```ini
+# EditorConfig is awesome: https://EditorConfig.org
+
+root = true
+
+# All files
+[*]
+charset = utf-8
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# C# files
+[*.cs]
+indent_size = 4
+
+# Naming conventions
+dotnet_naming_rule.interfaces_should_be_prefixed_with_i.severity = warning
+dotnet_naming_rule.interfaces_should_be_prefixed_with_i.symbols = interface
+dotnet_naming_rule.interfaces_should_be_prefixed_with_i.style = begins_with_i
+
+dotnet_naming_style.begins_with_i.required_prefix = I
+dotnet_naming_style.begins_with_i.capitalization = pascal_case
+
+# Code style rules
+csharp_prefer_braces = true:warning
+csharp_prefer_simple_using_statement = true:suggestion
+csharp_prefer_static_local_function = true:suggestion
+csharp_style_prefer_switch_expression = true:suggestion
+
+# Modifier order
+csharp_preferred_modifier_order = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async:suggestion
+
+# Expression preferences
+dotnet_style_prefer_auto_properties = true:suggestion
+dotnet_style_prefer_conditional_expression_over_assignment = true:silent
+dotnet_style_prefer_inferred_tuple_names = true:suggestion
+dotnet_style_prefer_inferred_anonymous_type_member_names = true:suggestion
+
+# Organize usings
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+
+# Avoid this. unless necessary
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_qualification_for_method = false:suggestion
+dotnet_style_qualification_for_event = false:suggestion
+
+# Language keywords instead of framework type names
+dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
+dotnet_style_predefined_type_for_member_access = true:suggestion
+
+# Parentheses preferences
+dotnet_style_parentheses_in_arithmetic_binary_operators = always_for_clarity:silent
+dotnet_style_parentheses_in_other_binary_operators = always_for_clarity:silent
+
+# Expression-level preferences
+csharp_prefer_simple_default_expression = true:suggestion
+
+# Pattern matching
+csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
+csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
+
+# Null checking
+csharp_style_throw_expression = true:suggestion
+csharp_style_conditional_delegate_call = true:suggestion
+
+# New line preferences
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+
+# Indentation
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
+
+# Space preferences
+csharp_space_after_cast = false
+csharp_space_after_keywords_in_control_flow_statements = true
+
+# Wrapping
+csharp_preserve_single_line_statements = false
+csharp_preserve_single_line_blocks = true
+
+# JSON files
+[*.json]
+indent_size = 2
+
+# YAML files
+[*.{yml,yaml}]
+indent_size = 2
+
+# XML files
+[*.{csproj,xml,config}]
+indent_size = 2
+```
+
+### 7.2 Configuration StyleCop (Directory.Build.props)
+
+```xml
+<Project>
+  <PropertyGroup>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <AnalysisMode>All</AnalysisMode>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="9.16.0.82469">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)stylecop.json" />
+  </ItemGroup>
+</Project>
+```
+
+### 7.3 Configuration SonarQube (sonar-project.properties)
+
+```properties
+# SonarQube configuration for Print3D Finder
+sonar.projectKey=print3d-finder
+sonar.projectName=Print3D Finder
+sonar.projectVersion=1.0
+
+# Source code
+sonar.sources=src
+sonar.tests=tests
+
+# Exclusions
+sonar.exclusions=**/Migrations/**,**/obj/**,**/bin/**,**/*.Designer.cs
+sonar.test.exclusions=**/*Tests/**
+
+# C# specific
+sonar.cs.opencover.reportsPaths=coverage.opencover.xml
+sonar.cs.vstest.reportsPaths=TestResults/*.trx
+
+# Quality gate thresholds
+sonar.qualitygate.wait=true
+
+# Code coverage
+sonar.coverage.exclusions=**/Program.cs,**/Startup.cs,**/*Tests/**
+
+# Duplicate detection
+sonar.cpd.exclusions=**/Migrations/**,**/*Dto.cs,**/*Entity.cs
+```
+
+### 7.4 Pipeline CI/CD avec Analyse de Qualité
+
+```yaml
+# .github/workflows/quality-check.yml
+name: Code Quality Check
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Shallow clones disabled for better analysis
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '10.0.x'
+    
+    - name: Restore dependencies
+      run: dotnet restore
+    
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+    
+    - name: Run tests with coverage
+      run: |
+        dotnet test --no-build --verbosity normal \
+          --configuration Release \
+          /p:CollectCoverage=true \
+          /p:CoverletOutputFormat=opencover \
+          /p:CoverletOutput=./coverage/
+    
+    - name: Install SonarScanner
+      run: dotnet tool install --global dotnet-sonarscanner
+    
+    - name: Begin SonarQube analysis
+      run: |
+        dotnet sonarscanner begin \
+          /k:"print3d-finder" \
+          /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}" \
+          /d:sonar.login="${{ secrets.SONAR_TOKEN }}" \
+          /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
+    
+    - name: Build for analysis
+      run: dotnet build --configuration Release
+    
+    - name: End SonarQube analysis
+      run: dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+    
+    - name: Check code coverage threshold
+      run: |
+        coverage=$(grep -oP 'line-rate="\K[0-9.]+' coverage.opencover.xml | head -1)
+        threshold=0.70
+        if (( $(echo "$coverage < $threshold" | bc -l) )); then
+          echo "Code coverage ($coverage) is below threshold ($threshold)"
+          exit 1
+        fi
+        echo "Code coverage: $coverage (threshold: $threshold) ✓"
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./coverage/coverage.opencover.xml
+        flags: unittests
+        name: codecov-umbrella
+    
+    - name: Check for security vulnerabilities
+      run: |
+        dotnet list package --vulnerable --include-transitive
+        if [ $? -ne 0 ]; then
+          echo "Security vulnerabilities detected!"
+          exit 1
+        fi
+```
+
+### 7.5 Exemple de Code Respectant les Standards
+
+```csharp
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Print3DFinder.Core.Entities;
+using Print3DFinder.Core.Interfaces;
+
+namespace Print3DFinder.Services
+{
+    /// <summary>
+    /// Service de gestion des commandes d'impression 3D.
+    /// Gère la création, la mise à jour et le suivi des commandes.
+    /// </summary>
+    public class OrderService : IOrderService
+    {
+        private readonly IApplicationDbContext _context;
+        private readonly IEmailNotificationService _emailService;
+        private readonly ILogger<OrderService> _logger;
+
+        /// <summary>
+        /// Initialise une nouvelle instance de <see cref="OrderService"/>.
+        /// </summary>
+        /// <param name="context">Le contexte de base de données</param>
+        /// <param name="emailService">Le service de notification email</param>
+        /// <param name="logger">Le logger pour enregistrer les événements</param>
+        /// <exception cref="ArgumentNullException">
+        /// Si l'un des paramètres est null
+        /// </exception>
+        public OrderService(
+            IApplicationDbContext context,
+            IEmailNotificationService emailService,
+            ILogger<OrderService> logger)
+        {
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        /// <summary>
+        /// Crée une nouvelle commande d'impression 3D.
+        /// </summary>
+        /// <param name="request">Les détails de la commande</param>
+        /// <returns>La commande créée avec son identifiant unique</returns>
+        /// <exception cref="ArgumentNullException">Si request est null</exception>
+        /// <exception cref="ValidationException">Si les données sont invalides</exception>
+        /// <exception cref="NotFoundException">Si le modèle 3D n'existe pas</exception>
+        public async Task<Order> CreateOrderAsync(CreateOrderRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            _logger.LogInformation(
+                "Creating order for user {UserId}, model {ModelId}",
+                request.UserId,
+                request.ModelId);
+
+            try
+            {
+                // Valider que le modèle existe
+                var model = await _context.Models
+                    .FindAsync(request.ModelId)
+                    ?? throw new NotFoundException($"Model {request.ModelId} not found");
+
+                // Créer la commande
+                var order = new Order
+                {
+                    Id = Guid.NewGuid(),
+                    OrderNumber = GenerateOrderNumber(),
+                    UserId = request.UserId,
+                    ModelId = request.ModelId,
+                    MaterialId = request.MaterialId,
+                    Color = request.Color,
+                    Quality = request.Quality,
+                    Status = OrderStatus.PendingValidation,
+                    TotalCost = CalculateTotalCost(model, request),
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                _context.Orders.Add(order);
+                await _context.SaveChangesAsync();
+
+                // Charger les relations pour l'email
+                await LoadOrderRelationsAsync(order);
+
+                // Envoyer notification à l'imprimeur
+                await _emailService.SendNewOrderNotificationToAdminAsync(order, order.User);
+
+                _logger.LogInformation(
+                    "Order {OrderNumber} created successfully",
+                    order.OrderNumber);
+
+                return order;
+            }
+            catch (Exception ex) when (ex is not NotFoundException and not ValidationException)
+            {
+                _logger.LogError(
+                    ex,
+                    "Error creating order for user {UserId}",
+                    request.UserId);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Génère un numéro de commande unique au format REF-YYYYMMDD-XXXXXXXX.
+        /// </summary>
+        /// <returns>Le numéro de commande généré</returns>
+        private static string GenerateOrderNumber()
+        {
+            var date = DateTime.UtcNow.ToString("yyyyMMdd");
+            var guid = Guid.NewGuid().ToString()[..8].ToUpperInvariant();
+            return $"REF-{date}-{guid}";
+        }
+
+        /// <summary>
+        /// Calcule le coût total de la commande.
+        /// </summary>
+        /// <param name="model">Le modèle 3D à imprimer</param>
+        /// <param name="request">Les détails de la commande</param>
+        /// <returns>Le coût total en euros</returns>
+        private static decimal CalculateTotalCost(Model3D model, CreateOrderRequest request)
+        {
+            // Logique de calcul du coût
+            // Basé sur le volume, le matériau, la qualité, etc.
+            const decimal baseCostPerCm3 = 0.15m;
+            var materialMultiplier = GetMaterialMultiplier(request.MaterialId);
+            var qualityMultiplier = GetQualityMultiplier(request.Quality);
+
+            var materialCost = model.Volume * baseCostPerCm3 * materialMultiplier;
+            var totalCost = materialCost * qualityMultiplier;
+
+            return Math.Round(totalCost, 2);
+        }
+
+        private static decimal GetMaterialMultiplier(Guid materialId)
+        {
+            // Implémentation simplifiée
+            return 1.0m;
+        }
+
+        private static decimal GetQualityMultiplier(PrintQuality quality)
+        {
+            return quality switch
+            {
+                PrintQuality.Draft => 0.8m,
+                PrintQuality.Standard => 1.0m,
+                PrintQuality.HighQuality => 1.5m,
+                _ => 1.0m
+            };
+        }
+
+        private async Task LoadOrderRelationsAsync(Order order)
+        {
+            await _context.Entry(order).Reference(o => o.Model).LoadAsync();
+            await _context.Entry(order).Reference(o => o.Material).LoadAsync();
+            await _context.Entry(order).Reference(o => o.User).LoadAsync();
+        }
+    }
+}
+```
+
 ---
 
 **Document d'Architecture Technique - Version 1.0**  

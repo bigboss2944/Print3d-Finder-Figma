@@ -550,6 +550,151 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
   - Analyse de sécurité (SAST)
   - Validation avant merge
 
+#### 4.5.3 Standards de Qualité du Code
+
+**Le code doit respecter les standards de qualité suivants** :
+
+##### 4.5.3.1 Conventions de Codage
+
+**Standards C# / .NET** :
+- Suivre les [conventions de codage Microsoft C#](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions)
+- Utiliser les [conventions de nommage .NET](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/naming-guidelines)
+- Respecter les principes SOLID
+- Appliquer les patterns de conception appropriés
+
+**Règles de nommage** :
+- **Classes** : PascalCase (ex: `UserService`, `OrderController`)
+- **Interfaces** : I + PascalCase (ex: `IEmailService`, `IRepository`)
+- **Méthodes** : PascalCase (ex: `GetUserById`, `ProcessOrder`)
+- **Variables locales** : camelCase (ex: `userId`, `orderTotal`)
+- **Constantes** : PascalCase (ex: `MaxFileSize`, `DefaultTimeout`)
+- **Champs privés** : _camelCase (ex: `_logger`, `_dbContext`)
+
+**Organisation du code** :
+- Maximum 300 lignes par fichier
+- Maximum 50 lignes par méthode
+- Maximum 5 paramètres par méthode
+- Complexité cyclomatique < 10
+- Pas de code dupliqué (DRY principle)
+
+##### 4.5.3.2 Documentation du Code
+
+**Commentaires XML obligatoires** pour :
+```csharp
+/// <summary>
+/// Crée une nouvelle commande d'impression 3D.
+/// </summary>
+/// <param name="request">Les détails de la commande à créer</param>
+/// <returns>La commande créée avec son identifiant unique</returns>
+/// <exception cref="ValidationException">Si les données de la commande sont invalides</exception>
+/// <exception cref="NotFoundException">Si le modèle 3D n'existe pas</exception>
+public async Task<Order> CreateOrderAsync(CreateOrderRequest request)
+{
+    // Implémentation
+}
+```
+
+**Commentaires dans le code** :
+- Expliquer le "pourquoi", pas le "quoi"
+- Documenter les algorithmes complexes
+- Expliquer les décisions techniques importantes
+- Marquer les TODOs avec date et responsable
+
+##### 4.5.3.3 Analyse Statique du Code
+
+**Outils obligatoires** :
+- **StyleCop Analyzers** : Vérification des conventions de style
+- **Roslyn Analyzers** : Analyse de code .NET
+- **SonarQube / SonarCloud** : Analyse de qualité et sécurité
+- **Code Coverage** : Couverture de tests (minimum 70%)
+
+**Configuration .editorconfig** :
+```ini
+# Conventions de codage C#
+[*.cs]
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+# Règles de nommage
+dotnet_naming_rule.interfaces_should_be_prefixed_with_i.severity = warning
+dotnet_naming_rule.interfaces_should_be_prefixed_with_i.symbols = interface
+dotnet_naming_rule.interfaces_should_be_prefixed_with_i.style = begins_with_i
+
+# Règles de style
+csharp_prefer_braces = true:warning
+csharp_prefer_simple_using_statement = true:suggestion
+dotnet_sort_system_directives_first = true
+```
+
+##### 4.5.3.4 Métriques de Qualité
+
+**Seuils minimums requis** :
+- **Couverture de code** : ≥ 70% (objectif 80%+)
+- **Complexité cyclomatique** : < 10 par méthode
+- **Maintenabilité** : Indice ≥ 70 (sur 100)
+- **Duplication** : < 3% du code
+- **Bugs critiques** : 0
+- **Vulnérabilités** : 0
+- **Code smells majeurs** : < 5
+
+**Évaluation SonarQube** :
+- Note globale : A ou B minimum
+- Fiabilité : A minimum
+- Sécurité : A minimum
+- Maintenabilité : A ou B minimum
+- Couverture : ≥ 70%
+- Duplications : < 3%
+
+##### 4.5.3.5 Revues de Code
+
+**Processus de revue obligatoire** :
+- Toute Pull Request doit être revue par au moins un autre développeur (auto-revue pour solo dev)
+- Checklist de revue :
+  - ✅ Le code respecte les conventions de nommage
+  - ✅ Les tests sont présents et passent
+  - ✅ Pas de code commenté laissé inutilement
+  - ✅ Pas de secrets ou credentials en dur
+  - ✅ Documentation XML présente
+  - ✅ Gestion d'erreurs appropriée
+  - ✅ Performance acceptable
+  - ✅ Pas de code dupliqué
+  - ✅ Principes SOLID respectés
+
+**Critères de validation** :
+- Tous les tests passent (unitaires, intégration, e2e)
+- Couverture de code maintenue ou améliorée
+- Pas de nouvelles violations de qualité
+- Documentation à jour
+- CHANGELOG.md mis à jour si nécessaire
+
+##### 4.5.3.6 Gestion des Dépendances
+
+**Vérification des packages** :
+- Audit de sécurité automatique (`dotnet list package --vulnerable`)
+- Mise à jour régulière des packages (avec tests de non-régression)
+- Suppression des packages inutilisés
+- Vérification des licences (uniquement MIT, Apache 2.0, BSD)
+
+##### 4.5.3.7 Refactoring Continu
+
+**Pratiques de refactoring** :
+- Refactoring régulier du code legacy
+- Élimination de la dette technique
+- Amélioration continue de la qualité
+- Application des principes Clean Code
+- Simplification des structures complexes
+
+##### 4.5.3.8 Performance et Optimisation
+
+**Bonnes pratiques** :
+- Profiling régulier du code
+- Optimisation des requêtes base de données
+- Utilisation appropriée du cache
+- Async/await correctement utilisé
+- Pas de blocking calls dans le code async
+- Memory leaks détectés et corrigés
+
 ### 4.6 Expérience Utilisateur (UX)
 
 #### 4.6.1 Messages d'Erreur
@@ -835,8 +980,29 @@ Le développeur travaillera **en temps partiel** sur ce projet, alternant avec d
 - ✅ Couverture de tests > 70% (objectif 80%+)
 - ✅ **Tous les packages utilisés sont open-source et maintenus activement**
 - ✅ **Toutes les images sont libres de droits** (Unsplash, Pexels, Pixabay)
+- ✅ **Code respectant les standards de qualité** :
+  - Conventions de codage Microsoft C# / .NET
+  - Complexité cyclomatique < 10
+  - Pas de duplication de code (< 3%)
+  - Documentation XML pour toutes les API publiques
+- ✅ **Analyse statique du code** (StyleCop, Roslyn, SonarQube)
+- ✅ **Métriques de qualité SonarQube** : Note A ou B minimum
 - ✅ Documentation complète livrée
 - ✅ Planning adapté au développement en temps partiel
+
+### 10.4 Qualité du Code
+- ✅ **Conventions de nommage respectées** (PascalCase, camelCase, _camelCase)
+- ✅ **StyleCop Analyzers activé** : 0 violation
+- ✅ **SonarQube Quality Gate passé** :
+  - Fiabilité : A
+  - Sécurité : A  
+  - Maintenabilité : A ou B
+  - Couverture : ≥ 70%
+  - Duplication : < 3%
+- ✅ **Revues de code systématiques** avec checklist validée
+- ✅ **Pas de vulnérabilités** dans les dépendances
+- ✅ **Configuration .editorconfig** appliquée
+- ✅ **Refactoring continu** de la dette technique
 
 ### 10.3 Sécurité
 - ✅ **Connexion HTTPS/TLS 1.3 obligatoire pour toutes les communications**
