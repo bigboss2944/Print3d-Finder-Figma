@@ -1262,10 +1262,8 @@ public class NozzleDto
     public string Material { get; set; }
     public string Description { get; set; }
     public bool IsActive { get; set; }
-    public double MinLayerHeight { get; set; }
-    public double MaxLayerHeight { get; set; }
-    public int RecommendedSpeed { get; set; }
-    public bool SupportsAbrasiveMaterials { get; set; }
+    // Note: Propriétés avancées (hauteur couche, vitesse, matériaux abrasifs) 
+    // seront ajoutées dans une phase ultérieure
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }
@@ -1286,16 +1284,8 @@ public class CreateNozzleRequest
     [MaxLength(500)]
     public string Description { get; set; }
 
-    [Range(0.05, 1.0, ErrorMessage = "La hauteur de couche minimale doit être entre 0.05 et 1.0 mm")]
-    public double MinLayerHeight { get; set; }
-
-    [Range(0.05, 1.0, ErrorMessage = "La hauteur de couche maximale doit être entre 0.05 et 1.0 mm")]
-    public double MaxLayerHeight { get; set; }
-
-    [Range(10, 200, ErrorMessage = "La vitesse doit être entre 10 et 200 mm/s")]
-    public int RecommendedSpeed { get; set; } = 60;
-
-    public bool SupportsAbrasiveMaterials { get; set; } = false;
+    // Note: Propriétés avancées (hauteur de couche min/max, vitesse recommandée, 
+    // support matériaux abrasifs) seront ajoutées dans une phase ultérieure
 }
 
 public class UpdateNozzleRequest : CreateNozzleRequest
@@ -1499,14 +1489,10 @@ public class Nozzle
     
     public bool IsActive { get; set; } // Disponible ou non
     
-    // Qualités d'impression compatibles avec cette buse
-    public double MinLayerHeight { get; set; } // Hauteur de couche minimale en mm
-    public double MaxLayerHeight { get; set; } // Hauteur de couche maximale en mm
-    
-    public int RecommendedSpeed { get; set; } // Vitesse recommandée en mm/s
-    
-    // Compatibilité matériaux
-    public bool SupportsAbrasiveMaterials { get; set; } // Matériaux abrasifs (carbone, métallique)
+    // Note: Propriétés avancées pour phases ultérieures :
+    // - Hauteur de couche min/max
+    // - Vitesse recommandée
+    // - Support matériaux abrasifs
     
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
@@ -1627,10 +1613,6 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 Diameter = 0.2, 
                 Material = "Laiton", 
                 Description = "Pour détails fins et haute résolution",
-                MinLayerHeight = 0.05,
-                MaxLayerHeight = 0.15,
-                RecommendedSpeed = 40,
-                SupportsAbrasiveMaterials = false,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -1641,10 +1623,6 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 Diameter = 0.4, 
                 Material = "Laiton", 
                 Description = "Buse polyvalente, usage général",
-                MinLayerHeight = 0.1,
-                MaxLayerHeight = 0.3,
-                RecommendedSpeed = 60,
-                SupportsAbrasiveMaterials = false,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -1655,10 +1633,6 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 Diameter = 0.6, 
                 Material = "Laiton", 
                 Description = "Pour impressions rapides et objets volumineux",
-                MinLayerHeight = 0.2,
-                MaxLayerHeight = 0.4,
-                RecommendedSpeed = 80,
-                SupportsAbrasiveMaterials = false,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -1668,11 +1642,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 Name = "Buse 0.4mm Acier Trempé", 
                 Diameter = 0.4, 
                 Material = "Acier trempé", 
-                Description = "Pour matériaux abrasifs (carbone, métal)",
-                MinLayerHeight = 0.1,
-                MaxLayerHeight = 0.3,
-                RecommendedSpeed = 50,
-                SupportsAbrasiveMaterials = true,
+                Description = "Buse durcie (matériaux spéciaux pour phases ultérieures)",
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -1683,10 +1653,6 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 Diameter = 0.8, 
                 Material = "Laiton", 
                 Description = "Pour prototypes et grands volumes",
-                MinLayerHeight = 0.3,
-                MaxLayerHeight = 0.6,
-                RecommendedSpeed = 100,
-                SupportsAbrasiveMaterials = false,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow

@@ -278,17 +278,12 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
   - Vue d'ensemble de toutes les buses configurées
   - Informations : nom, diamètre (0.2mm, 0.4mm, 0.6mm, 0.8mm, etc.), matériau (laiton, acier trempé, ruby tip)
   - Statut (active/inactive)
-  - Hauteurs de couche compatibles (min/max)
-  - Vitesse d'impression recommandée
-  - Compatibilité avec matériaux abrasifs
 - **Ajout de buses** :
   - Nom descriptif (ex: "Buse 0.4mm Standard", "Buse 0.2mm Haute Précision")
   - Diamètre en mm
   - Matériau de fabrication
-  - Plage de hauteur de couche (min/max)
-  - Vitesse recommandée
-  - Support des matériaux abrasifs (carbone, métal)
   - Description et cas d'usage
+  - *(Fonctionnalités avancées pour phases ultérieures : plage hauteur de couche, vitesse recommandée, matériaux abrasifs)*
 - **Modification de buses** :
   - Mise à jour des paramètres
   - Désactivation temporaire si maintenance/remplacement nécessaire
