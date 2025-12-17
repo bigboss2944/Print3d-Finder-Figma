@@ -826,7 +826,7 @@ Les messages d'erreur doivent être **suffisamment explicites** pour guider l'ut
 ### 5.1 Parcours Utilisateur Type
 
 1. **Inscription/Connexion**
-   - L'utilisateur créé un compte avec nom d'utilisateur sécurisé
+   - L'utilisateur créé un compte avec nom d'utilisateur et mot de passe sécurisé
    - Vérification par email
    - Connexion sécurisée avec JWT
 

@@ -54,6 +54,357 @@
 
 ## 2. Architecture Détaillée par Couche
 
+### 2.0 Bibliothèque Partagée (Shared Library)
+
+#### 2.0.1 Vue d'Ensemble
+
+**Une bibliothèque .NET Standard 2.1 / .NET 10 Class Library contenant tous les composants communs entre le backend (API), le frontend (Blazor) et l'application mobile (MAUI).**
+
+Cette architecture garantit la **cohérence, la réutilisabilité et la maintenabilité** du code à travers toutes les couches de l'application.
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                Print3DFinder.Shared                      │
+│             (Bibliothèque Partagée)                      │
+│                .NET Standard 2.1 / .NET 10               │
+└────────┬──────────────────────┬────────────────┬─────────┘
+         │                      │                │
+         │                      │                │
+    ┌────▼─────┐         ┌──────▼─────┐    ┌────▼────────┐
+    │ Backend  │         │  Frontend  │    │   Mobile    │
+    │   API    │         │   Blazor   │    │   MAUI      │
+    │ .NET 10  │         │  .NET 10   │    │  .NET 10    │
+    └──────────┘         └────────────┘    └─────────────┘
+```
+
+#### 2.0.2 Structure de la Bibliothèque Partagée
+
+```
+Print3DFinder.Shared/
+├── Models/                          # Entités du domaine métier
+│   ├── Model3D.cs                   # Modèle 3D
+│   ├── User.cs                      # Utilisateur
+│   ├── Order.cs                     # Commande
+│   ├── Material.cs                  # Matériau d'impression
+│   ├── ModelSource.cs               # Source de modèles (sites web)
+│   ├── PrintConfiguration.cs       # Configuration d'impression
+│   ├── AnalysisReport.cs            # Rapport d'analyse
+│   └── Review.cs                    # Avis/évaluation
+│
+├── DTOs/                            # Data Transfer Objects
+│   ├── Requests/                    # Requêtes vers l'API
+│   │   ├── CreateOrderRequest.cs
+│   │   ├── UpdateOrderRequest.cs
+│   │   ├── SearchRequest.cs
+│   │   ├── ImageSearchRequest.cs
+│   │   ├── RegisterRequest.cs
+│   │   ├── LoginRequest.cs
+│   │   ├── UpdateUserRequest.cs
+│   │   └── PrintConfigurationRequest.cs
+│   │
+│   └── Responses/                   # Réponses de l'API
+│       ├── OrderResponse.cs
+│       ├── SearchResultResponse.cs
+│       ├── ModelDetailsResponse.cs
+│       ├── AnalysisReportResponse.cs
+│       ├── AuthResponse.cs          # Token JWT + user info
+│       ├── UserProfileResponse.cs
+│       └── ApiErrorResponse.cs      # Erreurs standardisées
+│
+├── Enums/                           # Types énumérés
+│   ├── OrderStatus.cs               # En attente, en cours, expédié...
+│   ├── MaterialType.cs              # PLA, ABS, PETG, Résine...
+│   ├── PrintQuality.cs              # Brouillon, Standard, Haute qualité
+│   ├── UserRole.cs                  # User, Admin, SuperAdmin
+│   ├── FileFormat.cs                # STL, OBJ, 3MF
+│   ├── ModelCategory.cs             # Décoration, Gadget, Art...
+│   └── AnalysisStatus.cs            # Imprimable, Non imprimable...
+│
+├── Validators/                      # Règles de validation (FluentValidation)
+│   ├── CreateOrderValidator.cs
+│   ├── SearchRequestValidator.cs
+│   ├── RegisterRequestValidator.cs
+│   ├── LoginRequestValidator.cs
+│   ├── ImageUploadValidator.cs
+│   └── PrintConfigurationValidator.cs
+│
+├── Constants/                       # Valeurs constantes partagées
+│   ├── AppConstants.cs              # Constantes générales
+│   ├── ValidationConstants.cs       # Limites de validation
+│   ├── ApiEndpoints.cs              # URLs des endpoints API
+│   ├── FileConstants.cs             # Tailles max, formats acceptés
+│   ├── PrintConstants.cs            # Paramètres d'impression
+│   └── ErrorCodes.cs                # Codes d'erreur standardisés
+│
+├── Interfaces/                      # Contrats de services
+│   ├── IApiService.cs               # Service API générique
+│   ├── IAuthenticationService.cs    # Authentification
+│   ├── INotificationService.cs      # Notifications
+│   ├── IStorageService.cs           # Stockage local/cloud
+│   └── IAnalyticsService.cs         # Analytics/tracking
+│
+├── Extensions/                      # Méthodes d'extension utilitaires
+│   ├── StringExtensions.cs          # Manipulation de strings
+│   ├── DateTimeExtensions.cs        # Formatage dates
+│   ├── ValidationExtensions.cs      # Helpers validation
+│   ├── EnumExtensions.cs            # Helpers enums
+│   └── CollectionExtensions.cs      # Helpers collections
+│
+├── Helpers/                         # Classes d'aide
+│   ├── PriceCalculator.cs           # Calcul des prix
+│   ├── TimeEstimator.cs             # Estimation temps d'impression
+│   ├── VolumeCalculator.cs          # Calcul volumes 3D
+│   ├── ImageHelper.cs               # Manipulation images
+│   └── FormatHelper.cs              # Formatage (taille, poids...)
+│
+└── Attributes/                      # Attributs personnalisés
+    ├── AuthorizeRoleAttribute.cs    # Autorisation par rôle
+    ├── ValidateModelAttribute.cs    # Validation de modèle
+    └── ApiVersionAttribute.cs       # Versioning API
+```
+
+#### 2.0.3 Exemples de Code Partagé
+
+**Modèle de Domaine (Model3D.cs):**
+```csharp
+namespace Print3DFinder.Shared.Models
+{
+    public class Model3D
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Author { get; set; }
+        public string SourceUrl { get; set; }
+        public string License { get; set; }
+        
+        // Dimensions en mm
+        public decimal Length { get; set; }
+        public decimal Width { get; set; }
+        public decimal Height { get; set; }
+        
+        // Métadonnées
+        public FileFormat FileFormat { get; set; }
+        public ModelCategory Category { get; set; }
+        public decimal FileSizeMB { get; set; }
+        public int Downloads { get; set; }
+        public decimal AverageRating { get; set; }
+        
+        // Analyse d'impression
+        public decimal EstimatedVolumeCm3 { get; set; }
+        public int EstimatedPrintTimeMinutes { get; set; }
+        public bool RequiresSupports { get; set; }
+        
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+        
+        // Collections
+        public List<string> ImageUrls { get; set; } = new();
+        public List<MaterialType> CompatibleMaterials { get; set; } = new();
+        public List<string> Tags { get; set; } = new();
+    }
+}
+```
+
+**DTO de Requête (CreateOrderRequest.cs):**
+```csharp
+namespace Print3DFinder.Shared.DTOs.Requests
+{
+    public class CreateOrderRequest
+    {
+        public Guid ModelId { get; set; }
+        public MaterialType Material { get; set; }
+        public string Color { get; set; }
+        public PrintQuality Quality { get; set; }
+        public int InfillPercentage { get; set; }
+        public decimal Scale { get; set; } = 1.0m;
+        public bool AddSupports { get; set; }
+        public bool PostProcessing { get; set; }
+        
+        // Adresse de livraison
+        public string ShippingAddress { get; set; }
+        public string ShippingCity { get; set; }
+        public string ShippingPostalCode { get; set; }
+        public string ShippingCountry { get; set; }
+        
+        public string Notes { get; set; }
+    }
+}
+```
+
+**Validateur (CreateOrderValidator.cs):**
+```csharp
+using FluentValidation;
+
+namespace Print3DFinder.Shared.Validators
+{
+    public class CreateOrderRequestValidator : AbstractValidator<CreateOrderRequest>
+    {
+        public CreateOrderRequestValidator()
+        {
+            RuleFor(x => x.ModelId)
+                .NotEmpty()
+                .WithMessage("Le modèle 3D est requis");
+            
+            RuleFor(x => x.Material)
+                .IsInEnum()
+                .WithMessage("Matériau invalide");
+            
+            RuleFor(x => x.InfillPercentage)
+                .InclusiveBetween(10, 100)
+                .WithMessage("Le remplissage doit être entre 10% et 100%");
+            
+            RuleFor(x => x.Scale)
+                .GreaterThan(0)
+                .LessThanOrEqualTo(5)
+                .WithMessage("L'échelle doit être entre 0.1 et 5");
+            
+            RuleFor(x => x.ShippingAddress)
+                .NotEmpty()
+                .MaximumLength(200)
+                .WithMessage("Adresse de livraison requise (max 200 caractères)");
+            
+            RuleFor(x => x.ShippingPostalCode)
+                .NotEmpty()
+                .Matches(@"^\d{5}$")
+                .WithMessage("Code postal invalide (format: 12345)");
+        }
+    }
+}
+```
+
+**Constantes (ValidationConstants.cs):**
+```csharp
+namespace Print3DFinder.Shared.Constants
+{
+    public static class ValidationConstants
+    {
+        // Fichiers
+        public const int MaxFileSizeMB = 50;
+        public const int MaxImageSizeMB = 10;
+        
+        // Utilisateurs
+        public const int MinPasswordLength = 8;
+        public const int MaxPasswordLength = 100;
+        public const int MinUsernameLength = 3;
+        public const int MaxUsernameLength = 50;
+        
+        // Modèles 3D
+        public const int MaxModelNameLength = 200;
+        public const int MaxDescriptionLength = 5000;
+        public const decimal MaxPrintVolumeCm3 = 1000000; // 1m³
+        
+        // Commandes
+        public const int MinInfillPercentage = 10;
+        public const int MaxInfillPercentage = 100;
+        public const decimal MinScale = 0.1m;
+        public const decimal MaxScale = 5.0m;
+        
+        // Recherche
+        public const int MinSearchQueryLength = 2;
+        public const int MaxSearchQueryLength = 100;
+        public const int MaxSearchResults = 100;
+    }
+}
+```
+
+**Extension Utilitaire (StringExtensions.cs):**
+```csharp
+namespace Print3DFinder.Shared.Extensions
+{
+    public static class StringExtensions
+    {
+        public static string Truncate(this string value, int maxLength)
+        {
+            if (string.IsNullOrEmpty(value)) return value;
+            return value.Length <= maxLength 
+                ? value 
+                : value.Substring(0, maxLength) + "...";
+        }
+        
+        public static string ToSlug(this string value)
+        {
+            return value
+                .ToLowerInvariant()
+                .Replace(" ", "-")
+                .Replace("é", "e")
+                .Replace("è", "e")
+                .Replace("à", "a");
+        }
+        
+        public static bool IsValidEmail(this string email)
+        {
+            if (string.IsNullOrWhiteSpace(email)) return false;
+            return System.Text.RegularExpressions.Regex.IsMatch(
+                email, 
+                @"^[^@\s]+@[^@\s]+\.[^@\s]+$"
+            );
+        }
+    }
+}
+```
+
+#### 2.0.4 Avantages de l'Architecture Partagée
+
+✅ **Cohérence absolue:**
+- Mêmes modèles de données sur toutes les plateformes
+- Validations identiques côté client et serveur
+- Énumérations synchronisées automatiquement
+
+✅ **Réduction de la duplication:**
+- Code écrit une seule fois, utilisé partout
+- Maintenance simplifiée (un seul point de modification)
+- Moins de risques d'incohérences
+
+✅ **Type Safety:**
+- Compilation vérifiée entre couches
+- IntelliSense complet dans tous les projets
+- Détection d'erreurs à la compilation (pas au runtime)
+
+✅ **Maintenabilité:**
+- Changements propagés automatiquement
+- Refactoring sécurisé avec outils IDE
+- Documentation centralisée
+
+✅ **Testabilité:**
+- Tests unitaires sur validateurs partagés
+- Tests d'intégration avec DTOs réels
+- Mocks et stubs simplifiés
+
+#### 2.0.5 Références de Projet
+
+**Backend API → Print3DFinder.Shared:**
+```xml
+<ProjectReference Include="..\Print3DFinder.Shared\Print3DFinder.Shared.csproj" />
+```
+
+**Frontend Blazor → Print3DFinder.Shared:**
+```xml
+<ProjectReference Include="..\Print3DFinder.Shared\Print3DFinder.Shared.csproj" />
+```
+
+**Mobile MAUI → Print3DFinder.Shared:**
+```xml
+<ProjectReference Include="..\Print3DFinder.Shared\Print3DFinder.Shared.csproj" />
+```
+
+#### 2.0.6 Gestion des Versions
+
+- **Versioning sémantique (SemVer):** v1.0.0, v1.1.0, v2.0.0
+- **Breaking changes:** Version majeure (2.0.0)
+- **Nouvelles fonctionnalités:** Version mineure (1.1.0)
+- **Corrections de bugs:** Version patch (1.0.1)
+
+**Package NuGet privé (optionnel):**
+- Hébergement sur Azure Artifacts ou GitHub Packages
+- CI/CD pour publication automatique
+- Versioning automatique avec GitVersion
+
+**Migration lors de breaking changes:**
+- Documentation des changements (CHANGELOG.md)
+- Période de transition avec support multi-versions
+- Scripts de migration fournis
+
 ### 2.1 Couche Présentation
 
 #### 2.1.1 Application Web (Blazor .NET 10)
