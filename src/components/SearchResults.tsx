@@ -19,6 +19,7 @@ const mockModels: Model3D[] = [
     category: 'Décoration',
     rating: 4.8,
     downloads: 1243,
+    author: 'Marie Dubois',
   },
   {
     id: '2',
@@ -28,6 +29,7 @@ const mockModels: Model3D[] = [
     category: 'Jouets',
     rating: 4.9,
     downloads: 2847,
+    author: 'Jean-Luc Artisan3D',
   },
   {
     id: '3',
@@ -37,6 +39,7 @@ const mockModels: Model3D[] = [
     category: 'Utilitaire',
     rating: 4.7,
     downloads: 3421,
+    author: 'TechMaker Studio',
   },
   {
     id: '4',
@@ -46,6 +49,7 @@ const mockModels: Model3D[] = [
     category: 'Jouets',
     rating: 4.6,
     downloads: 1876,
+    author: 'Sophie Martin',
   },
   {
     id: '5',
@@ -55,6 +59,7 @@ const mockModels: Model3D[] = [
     category: 'Utilitaire',
     rating: 4.5,
     downloads: 2134,
+    author: 'OfficeDesigns Pro',
   },
   {
     id: '6',
@@ -64,6 +69,7 @@ const mockModels: Model3D[] = [
     category: 'Mode',
     rating: 4.3,
     downloads: 5632,
+    author: 'CustomCreations',
   },
 ];
 

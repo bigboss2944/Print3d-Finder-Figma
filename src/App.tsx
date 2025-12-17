@@ -25,6 +25,7 @@ export interface Model3D {
   category: string;
   rating: number;
   downloads: number;
+  author?: string;
 }
 
 export default function App() {

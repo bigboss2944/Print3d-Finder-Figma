@@ -9,6 +9,7 @@ import {
   Ruler,
   Package,
   Clock,
+  User,
 } from "lucide-react";
 import { Model3D } from "../App";
 import { Navigation } from "./Navigation";
@@ -94,6 +95,16 @@ export function ModelDetails({
                 Informations du modèle
               </h3>
               <div className="space-y-3">
+                {model.author && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 flex items-center gap-2">
+                      Créateur
+                    </span>
+                    <span className="text-gray-900 font-medium">
+                      {model.author}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-gray-600">
                     Catégorie

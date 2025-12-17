@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { PrintDetailModal } from './PrintDetailModal';
 import { ConfirmDeleteModal } from './ConfirmDeleteModal';
+import { MaterialsManagement } from './MaterialsManagement';
+import { SourcesManagement } from './SourcesManagement';
 
 interface AdminDashboardProps {
   onBack: () => void;
@@ -53,7 +55,7 @@ interface UserAccount {
 }
 
 export function AdminDashboard({ onBack, onLogout }: AdminDashboardProps) {
-  const [activeTab, setActiveTab] = useState<'requests' | 'users' | 'stats'>('requests');
+  const [activeTab, setActiveTab] = useState<'requests' | 'users' | 'materials' | 'sources' | 'stats'>('requests');
   const [filterStatus, setFilterStatus] = useState<'all' | PrintRequest['status']>('all');
   const [requests, setRequests] = useState<PrintRequest[]>([
     {
@@ -341,6 +343,26 @@ export function AdminDashboard({ onBack, onLogout }: AdminDashboardProps) {
                 Utilisateurs
               </button>
               <button
+                onClick={() => setActiveTab('materials')}
+                className={`flex-1 sm:flex-none px-4 sm:px-6 py-4 border-b-2 transition-colors whitespace-nowrap ${
+                  activeTab === 'materials'
+                    ? 'border-indigo-600 text-indigo-600'
+                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Matériaux
+              </button>
+              <button
+                onClick={() => setActiveTab('sources')}
+                className={`flex-1 sm:flex-none px-4 sm:px-6 py-4 border-b-2 transition-colors whitespace-nowrap ${
+                  activeTab === 'sources'
+                    ? 'border-indigo-600 text-indigo-600'
+                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Sources
+              </button>
+              <button
                 onClick={() => setActiveTab('stats')}
                 className={`flex-1 sm:flex-none px-4 sm:px-6 py-4 border-b-2 transition-colors whitespace-nowrap ${
                   activeTab === 'stats'
@@ -533,6 +555,10 @@ export function AdminDashboard({ onBack, onLogout }: AdminDashboardProps) {
                 </div>
               </div>
             )}
+
+            {activeTab === 'materials' && <MaterialsManagement />}
+
+            {activeTab === 'sources' && <SourcesManagement />}
 
             {activeTab === 'stats' && (
               <div className="space-y-6">
