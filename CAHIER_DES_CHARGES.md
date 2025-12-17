@@ -1128,13 +1128,13 @@ Le développeur travaillera **en temps partiel** sur ce projet, alternant avec d
 - Nouvelles fonctionnalités : planning trimestriel
 
 ### 11.3 Évolutions Futures Envisagées
-- **Phase 2** :
+- **Phase 3** :
   - Upload de modèles 3D par les utilisateurs
   - Marketplace de modèles (créateurs tiers)
   - Communauté (partage, likes, commentaires)
   - Configurateur 3D avancé (personnalisation de modèles)
   
-- **Phase 3** :
+- **Phase 4** :
   - **Analyse structurelle avancée des modèles 3D** (overhangs, supports, stabilité)
   - **Gestion complète des buses d'impression** avec sélection par l'utilisateur
   - Calcul précis durée/coût selon buse choisie (impact sur consommation plastique)
