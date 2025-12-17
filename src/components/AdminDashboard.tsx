@@ -55,7 +55,7 @@ interface UserAccount {
 }
 
 export function AdminDashboard({ onBack, onLogout }: AdminDashboardProps) {
-  const [activeTab, setActiveTab] = useState<'requests' | 'users' | 'materials' | 'sources' | 'stats'>('requests');
+  const [activeTab, setActiveTab] = useState<'requests' | 'users' | 'materials' | 'sources'>('requests');
   const [filterStatus, setFilterStatus] = useState<'all' | PrintRequest['status']>('all');
   const [requests, setRequests] = useState<PrintRequest[]>([
     {
@@ -362,16 +362,6 @@ export function AdminDashboard({ onBack, onLogout }: AdminDashboardProps) {
               >
                 Sources
               </button>
-              <button
-                onClick={() => setActiveTab('stats')}
-                className={`flex-1 sm:flex-none px-4 sm:px-6 py-4 border-b-2 transition-colors whitespace-nowrap ${
-                  activeTab === 'stats'
-                    ? 'border-indigo-600 text-indigo-600'
-                    : 'border-transparent text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Statistiques
-              </button>
             </div>
           </div>
 
@@ -559,81 +549,6 @@ export function AdminDashboard({ onBack, onLogout }: AdminDashboardProps) {
             {activeTab === 'materials' && <MaterialsManagement />}
 
             {activeTab === 'sources' && <SourcesManagement />}
-
-            {activeTab === 'stats' && (
-              <div className="space-y-6">
-                <div className="grid sm:grid-cols-2 gap-6">
-                  <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl p-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <TrendingUp className="w-8 h-8 text-indigo-600" />
-                      <h3 className="text-gray-900">Performance</h3>
-                    </div>
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-gray-600 mb-1">Taux de complétion</p>
-                        <div className="flex items-center gap-3">
-                          <div className="flex-1 bg-white rounded-full h-3 overflow-hidden">
-                            <div className="bg-indigo-600 h-full" style={{ width: '85%' }}></div>
-                          </div>
-                          <span className="text-gray-900">85%</span>
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-gray-600 mb-1">Satisfaction client</p>
-                        <div className="flex items-center gap-3">
-                          <div className="flex-1 bg-white rounded-full h-3 overflow-hidden">
-                            <div className="bg-green-600 h-full" style={{ width: '92%' }}></div>
-                          </div>
-                          <span className="text-gray-900">92%</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <Clock className="w-8 h-8 text-green-600" />
-                      <h3 className="text-gray-900">Temps moyen</h3>
-                    </div>
-                    <p className="text-3xl text-gray-900 mb-2">{stats.avgCompletionTime}</p>
-                    <p className="text-gray-600">Par impression</p>
-                  </div>
-                </div>
-
-                <div className="bg-white border border-gray-200 rounded-xl p-6">
-                  <h3 className="text-gray-900 mb-4">Matériaux les plus utilisés</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-700">PLA</span>
-                      <div className="flex items-center gap-3 flex-1 max-w-xs">
-                        <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
-                          <div className="bg-blue-600 h-full" style={{ width: '65%' }}></div>
-                        </div>
-                        <span className="text-gray-900 w-12 text-right">65%</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-700">PETG</span>
-                      <div className="flex items-center gap-3 flex-1 max-w-xs">
-                        <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
-                          <div className="bg-purple-600 h-full" style={{ width: '25%' }}></div>
-                        </div>
-                        <span className="text-gray-900 w-12 text-right">25%</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-700">ABS</span>
-                      <div className="flex items-center gap-3 flex-1 max-w-xs">
-                        <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
-                          <div className="bg-indigo-600 h-full" style={{ width: '10%' }}></div>
-                        </div>
-                        <span className="text-gray-900 w-12 text-right">10%</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </main>

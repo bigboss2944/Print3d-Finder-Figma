@@ -14,7 +14,7 @@ const mockModels: Model3D[] = [
   {
     id: '1',
     name: 'Vase Géométrique Moderne',
-    description: 'Vase décoratif avec motifs géométriques, parfait pour petites plantes',
+    description: 'Vase décoratif avec motifs géométriques, parfait pour petites plantes. Impression en une seule pièce. Impression recommandée en PLA ou PETG pour de meilleurs résultats. Hauteur : 15 cm, Diamètre : 8 cm.',
     imageUrl: 'https://images.unsplash.com/photo-1703221561813-cdaa308cf9e7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHwzZCUyMHByaW50ZWQlMjB2YXNlfGVufDF8fHx8MTc2NTQ0ODEzNXww&ixlib=rb-4.1.0&q=80&w=1080',
     category: 'Décoration',
     rating: 4.8,

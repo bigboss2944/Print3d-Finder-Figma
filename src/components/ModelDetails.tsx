@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   ArrowLeft,
   Star,
@@ -10,6 +11,7 @@ import {
   Package,
   Clock,
   User,
+  X,
 } from "lucide-react";
 import { Model3D } from "../App";
 import { Navigation } from "./Navigation";
@@ -31,6 +33,14 @@ export function ModelDetails({
   onGoToProfile,
   onGoToAdmin,
 }: ModelDetailsProps) {
+  const [isDescriptionModalOpen, setIsDescriptionModalOpen] = useState(false);
+  
+  const MAX_DESCRIPTION_LENGTH = 200;
+  const isDescriptionTruncated = model.description.length > MAX_DESCRIPTION_LENGTH;
+  const truncatedDescription = isDescriptionTruncated
+    ? model.description.substring(0, MAX_DESCRIPTION_LENGTH) + "..."
+    : model.description;
+
   const printAnalysis = {
     isPrintable: true,
     material: "PLA",
@@ -141,9 +151,19 @@ export function ModelDetails({
 
           <div>
             <h1 className="text-gray-900 mb-4">{model.name}</h1>
-            <p className="text-gray-600 mb-6">
-              {model.description}
-            </p>
+            <div className="mb-6">
+              <p className="text-gray-600">
+                {truncatedDescription}
+              </p>
+              {isDescriptionTruncated && (
+                <button
+                  onClick={() => setIsDescriptionModalOpen(true)}
+                  className="text-indigo-600 hover:text-indigo-700 mt-2 inline-flex items-center gap-1 text-sm font-medium"
+                >
+                  Description complète →
+                </button>
+              )}
+            </div>
 
             {printAnalysis.isPrintable ? (
               <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-6">
@@ -300,6 +320,37 @@ export function ModelDetails({
           </div>
         </div>
       </main>
+
+      {/* Modal Description Complète */}
+      {isDescriptionModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 sm:p-6 flex items-center justify-between">
+              <h3 className="text-gray-900">Description du modèle</h3>
+              <button
+                onClick={() => setIsDescriptionModalOpen(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-6 h-6 text-gray-600" />
+              </button>
+            </div>
+            <div className="p-4 sm:p-6 overflow-y-auto max-h-[calc(80vh-80px)]">
+              <h4 className="text-gray-900 mb-3">{model.name}</h4>
+              <p className="text-gray-600 whitespace-pre-wrap leading-relaxed">
+                {model.description}
+              </p>
+            </div>
+            <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 p-4 sm:p-6">
+              <button
+                onClick={() => setIsDescriptionModalOpen(false)}
+                className="w-full px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors"
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
