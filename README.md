@@ -94,7 +94,7 @@ Le projet respecte des **standards de qualité stricts** :
 - 🖼️ Visualisation de modèles avec images multiples + **auteur/créateur affiché** (Version 1)
 - 🎨 Visualisation 3D interactive (Version 2 - future)
 - 📊 Analyse automatique de printabilité (base : dimensions, matériaux, coûts)
-- ⚙️ Configuration personnalisée (matériau, couleur, **buse**, qualité)
+- ⚙️ Configuration personnalisée (matériau, couleur, qualité) - **Buse fixe 0.4mm en Phase 1**
 - 🛒 Commande et suivi d'impression
 - 📧 Notifications email
 - ✅ Messages d'erreur clairs et explicites
@@ -108,11 +108,11 @@ Le projet respecte des **standards de qualité stricts** :
 - 📦 Gestion des commandes en temps réel
 - 🎨 Gestion des modèles 3D avec informations auteur/source
 - 🧱 **Gestion des matériaux** (ajout, modification, prix, couleurs, stock)
-- 🔧 **Gestion des buses d'impression** (diamètres, qualités, compatibilités)
 - 🌐 **Gestion des sources de modèles** (configuration des sites web interrogés)
 - 🔄 Monitoring des synchronisations et performance des sources
 - 👥 Gestion des utilisateurs
 - 📈 Rapports et analytics
+- 🔧 *Gestion des buses d'impression → Phase 3* (Phase 1 utilise buse fixe 0.4mm)
 
 ## 🗺️ Roadmap
 

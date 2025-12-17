@@ -167,11 +167,11 @@ Affichage d'un rapport détaillé comprenant :
 L'utilisateur peut personnaliser :
 - **Matériau** : Choix parmi les matériaux compatibles
 - **Couleur** : Sélection de couleur (selon disponibilité)
-- **Buse d'impression** : Sélection automatique ou manuelle de la buse en fonction de la qualité souhaitée
-- **Qualité d'impression** (dépendante de la buse disponible) :
-  - Brouillon (0.3mm+) - rapide, moins détaillé
+- **Buse d'impression** : **Fixe à 0.4mm pour la Phase 1** (gestion et sélection de buses → Phase 3)
+- **Qualité d'impression** (avec buse 0.4mm fixe) :
+  - Brouillon (0.3mm) - rapide, moins détaillé
   - Standard (0.2mm) - équilibre qualité/temps
-  - Haute qualité (0.1mm-0.15mm) - détails fins, plus long
+  - Haute qualité (0.15mm) - détails fins, plus long
 - **Options additionnelles** :
   - Remplissage (10% à 100%)
   - Post-traitement (ponçage, peinture)
@@ -272,29 +272,7 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
   - Vérification des commandes en cours utilisant ce matériau
   - Archivage plutôt que suppression définitive
 
-#### 2.7.4 Gestion des Buses d'Impression
-**L'administrateur peut gérer les buses disponibles pour l'impression** (Phase 1) :
-- **Liste des buses** :
-  - Vue d'ensemble de toutes les buses configurées
-  - Informations : nom, diamètre (0.2mm, 0.4mm, 0.6mm, 0.8mm, etc.), matériau (laiton, acier trempé, ruby tip)
-  - Statut (active/inactive)
-- **Ajout de buses** :
-  - Nom descriptif (ex: "Buse 0.4mm Standard", "Buse 0.2mm Haute Précision")
-  - Diamètre en mm
-  - Matériau de fabrication
-  - Description et cas d'usage
-  - *(Fonctionnalités avancées pour phases ultérieures : plage hauteur de couche, vitesse recommandée, matériaux abrasifs)*
-- **Modification de buses** :
-  - Mise à jour des paramètres
-  - Désactivation temporaire si maintenance/remplacement nécessaire
-- **Relation avec la qualité d'impression** :
-  - **La qualité d'impression dépend directement des buses disponibles**
-  - Haute qualité (0.1-0.15mm) → Nécessite buse 0.2mm ou 0.4mm
-  - Standard (0.2mm) → Buse 0.4mm recommandée
-  - Brouillon/Rapide (0.3mm+) → Buse 0.6mm ou 0.8mm
-  - Sélection automatique de la buse en fonction de la qualité choisie par l'utilisateur
-
-#### 2.7.5 Gestion des Sources de Modèles 3D
+#### 2.7.4 Gestion des Sources de Modèles 3D
 **L'administrateur peut configurer les sites web interrogés pour récupérer les modèles** :
 - **Liste des sources actives** :
   - Vue d'ensemble des sites configurés (Thingiverse, MyMiniFactory, Cults3D, etc.)
@@ -418,7 +396,7 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
 - **SGBD Principal** : PostgreSQL 16+ ou SQL Server 2022
 - **ORM** : Entity Framework Core 10
 - **Schéma de données** :
-  - Tables : Users, Models, Orders, Categories, Materials, Nozzles, ModelSources, Reviews
+  - Tables : Users, Models, Orders, Categories, Materials, ModelSources, Reviews
   - Relations : One-to-Many, Many-to-Many avec tables de jointure
   - Index optimisés pour les requêtes de recherche
 - **Optimisation pour millions de modèles** :
@@ -466,7 +444,7 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
   - Estimation du temps d'impression
   - Vérification compatibilité avec volume d'impression
 
-**Phase 3** (Analyse structurelle avancée - développement futur) :
+**Phase 3** (Analyse structurelle avancée et gestion des buses - développement futur) :
 - **Librairies** :
   - OpenCascade ou CGAL pour analyse géométrique
   - Slic3r API ou PrusaSlicer pour simulation de slicing
@@ -476,8 +454,14 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
   - Détection des surfaces critiques
   - Stabilité structurelle
   - Calcul automatique des supports nécessaires
+- **Gestion des buses d'impression** :
+  - CRUD complet pour différentes buses (0.2mm, 0.4mm, 0.6mm, 0.8mm, 1.0mm)
+  - Sélection de buse par l'utilisateur en fonction de la qualité souhaitée
+  - Calcul de la durée d'impression et consommation de plastique selon la buse choisie
+  - Configuration des paramètres avancés (hauteur de couche, vitesse, matériaux abrasifs)
+  - Impact de la buse sur la qualité finale et le temps d'impression
 
-> **Note** : L'analyse structurelle complète sera implémentée après la mise en production de la Phase 1, permettant de se concentrer initialement sur les fonctionnalités essentielles.
+> **Note** : L'analyse structurelle complète et la gestion des buses seront implémentées après la mise en production de la Phase 1, permettant de se concentrer initialement sur les fonctionnalités essentielles. La Phase 1 utilise une buse fixe de 0.4mm pour toutes les impressions.
 
 ### 3.3 Sécurité
 
@@ -1067,14 +1051,13 @@ Le développeur travaillera **en temps partiel** sur ce projet, alternant avec d
 - ✅ Analyse de printabilité automatique de base (< 10s) - dimensions, matériaux, coûts
 - ⏳ Analyse structurelle avancée (Phase 3 - développement ultérieur)
 - ✅ Workflow de commande complet
-- ✅ **Qualité d'impression liée aux buses disponibles**
+- ✅ **Buse d'impression fixe à 0.4mm pour Phase 1** (gestion des buses → Phase 3)
 - ✅ **Notifications email automatiques à l'imprimeur pour chaque nouvelle commande**
 - ✅ Notifications par email aux utilisateurs
 - ✅ **Messages d'erreur explicites et actionnables**
 - ✅ Tableau de bord admin avec toutes fonctionnalités :
   - Gestion des commandes avec notifications email
   - **Gestion des matériaux** (ajout, modification, suppression, activation/désactivation)
-  - **Gestion des buses d'impression** (CRUD complet, configuration qualité/buse)
   - **Gestion des sources de modèles 3D** (configuration des sites web interrogés)
   - Monitoring des synchronisations et statistiques des sources
   - Gestion des utilisateurs et rôles
@@ -1152,6 +1135,9 @@ Le développeur travaillera **en temps partiel** sur ce projet, alternant avec d
   - Configurateur 3D avancé (personnalisation de modèles)
   
 - **Phase 3** :
+  - **Analyse structurelle avancée des modèles 3D** (overhangs, supports, stabilité)
+  - **Gestion complète des buses d'impression** avec sélection par l'utilisateur
+  - Calcul précis durée/coût selon buse choisie (impact sur consommation plastique)
   - Intelligence artificielle pour recommandations personnalisées
   - AR (Réalité Augmentée) pour visualiser le modèle chez soi
   - Abonnement mensuel (impressions illimitées)

@@ -1057,243 +1057,7 @@ public enum SourceStatus
 }
 ```
 
-#### 2.2.6 Controller Administrateur - Gestion des Buses
-
-```csharp
-[ApiController]
-[Route("api/admin/[controller]")]
-[Authorize(Roles = "Admin,SuperAdmin")]
-public class NozzlesController : ControllerBase
-{
-    private readonly INozzleService _nozzleService;
-    private readonly ILogger<NozzlesController> _logger;
-
-    public NozzlesController(
-        INozzleService nozzleService,
-        ILogger<NozzlesController> logger)
-    {
-        _nozzleService = nozzleService;
-        _logger = logger;
-    }
-
-    /// <summary>
-    /// Récupère la liste de toutes les buses
-    /// </summary>
-    [HttpGet]
-    public async Task<ActionResult<List<NozzleDto>>> GetAll(
-        [FromQuery] bool includeInactive = false)
-    {
-        try
-        {
-            var nozzles = await _nozzleService.GetAllAsync(includeInactive);
-            return Ok(nozzles);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error retrieving nozzles");
-            return StatusCode(500, "Erreur lors de la récupération des buses");
-        }
-    }
-
-    /// <summary>
-    /// Récupère une buse par son ID
-    /// </summary>
-    [HttpGet("{id}")]
-    public async Task<ActionResult<NozzleDto>> GetById(Guid id)
-    {
-        try
-        {
-            var nozzle = await _nozzleService.GetByIdAsync(id);
-            if (nozzle == null)
-                return NotFound($"Buse {id} introuvable");
-
-            return Ok(nozzle);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error retrieving nozzle {NozzleId}", id);
-            return StatusCode(500, "Erreur lors de la récupération de la buse");
-        }
-    }
-
-    /// <summary>
-    /// Crée une nouvelle buse
-    /// </summary>
-    [HttpPost]
-    public async Task<ActionResult<NozzleDto>> Create(
-        [FromBody] CreateNozzleRequest request)
-    {
-        try
-        {
-            var nozzle = await _nozzleService.CreateAsync(request);
-            
-            _logger.LogInformation(
-                "Nozzle {NozzleName} ({Diameter}mm) created by {UserId}",
-                nozzle.Name,
-                nozzle.Diameter,
-                User.FindFirst("sub")?.Value);
-
-            return CreatedAtAction(
-                nameof(GetById),
-                new { id = nozzle.Id },
-                nozzle);
-        }
-        catch (ValidationException ex)
-        {
-            return BadRequest(new { message = ex.Message, errors = ex.Errors });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error creating nozzle");
-            return StatusCode(500, "Erreur lors de la création de la buse");
-        }
-    }
-
-    /// <summary>
-    /// Met à jour une buse existante
-    /// </summary>
-    [HttpPut("{id}")]
-    public async Task<ActionResult<NozzleDto>> Update(
-        Guid id,
-        [FromBody] UpdateNozzleRequest request)
-    {
-        try
-        {
-            var nozzle = await _nozzleService.UpdateAsync(id, request);
-            if (nozzle == null)
-                return NotFound($"Buse {id} introuvable");
-
-            _logger.LogInformation(
-                "Nozzle {NozzleId} updated by {UserId}",
-                id,
-                User.FindFirst("sub")?.Value);
-
-            return Ok(nozzle);
-        }
-        catch (ValidationException ex)
-        {
-            return BadRequest(new { message = ex.Message, errors = ex.Errors });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating nozzle {NozzleId}", id);
-            return StatusCode(500, "Erreur lors de la mise à jour de la buse");
-        }
-    }
-
-    /// <summary>
-    /// Supprime (archive) une buse
-    /// </summary>
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(Guid id)
-    {
-        try
-        {
-            var result = await _nozzleService.DeleteAsync(id);
-            if (!result)
-                return NotFound($"Buse {id} introuvable");
-
-            _logger.LogInformation(
-                "Nozzle {NozzleId} deleted by {UserId}",
-                id,
-                User.FindFirst("sub")?.Value);
-
-            return NoContent();
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error deleting nozzle {NozzleId}", id);
-            return StatusCode(500, "Erreur lors de la suppression de la buse");
-        }
-    }
-
-    /// <summary>
-    /// Active ou désactive une buse
-    /// </summary>
-    [HttpPatch("{id}/toggle-status")]
-    public async Task<ActionResult> ToggleStatus(Guid id)
-    {
-        try
-        {
-            var result = await _nozzleService.ToggleStatusAsync(id);
-            if (!result)
-                return NotFound($"Buse {id} introuvable");
-
-            return NoContent();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error toggling nozzle status {NozzleId}", id);
-            return StatusCode(500, "Erreur lors du changement de statut");
-        }
-    }
-
-    /// <summary>
-    /// Récupère les buses compatibles avec un matériau et une qualité
-    /// </summary>
-    [HttpGet("compatible")]
-    public async Task<ActionResult<List<NozzleDto>>> GetCompatibleNozzles(
-        [FromQuery] string materialType,
-        [FromQuery] PrintQuality quality)
-    {
-        try
-        {
-            var nozzles = await _nozzleService.GetCompatibleNozzlesAsync(materialType, quality);
-            return Ok(nozzles);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error retrieving compatible nozzles");
-            return StatusCode(500, "Erreur lors de la récupération des buses compatibles");
-        }
-    }
-}
-
-// DTOs pour les buses
-public class NozzleDto
-{
-    public Guid Id { get; set; }
-    public string Name { get; set; }
-    public double Diameter { get; set; }
-    public string Material { get; set; }
-    public string Description { get; set; }
-    public bool IsActive { get; set; }
-    // Note: Propriétés avancées (hauteur couche, vitesse, matériaux abrasifs) 
-    // seront ajoutées dans une phase ultérieure
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
-}
-
-public class CreateNozzleRequest
-{
-    [Required(ErrorMessage = "Le nom de la buse est obligatoire")]
-    [MaxLength(50)]
-    public string Name { get; set; }
-
-    [Required]
-    [Range(0.1, 2.0, ErrorMessage = "Le diamètre doit être entre 0.1 et 2.0 mm")]
-    public double Diameter { get; set; }
-
-    [MaxLength(50)]
-    public string Material { get; set; } = "Laiton";
-
-    [MaxLength(500)]
-    public string Description { get; set; }
-
-    // Note: Propriétés avancées (hauteur de couche min/max, vitesse recommandée, 
-    // support matériaux abrasifs) seront ajoutées dans une phase ultérieure
-}
-
-public class UpdateNozzleRequest : CreateNozzleRequest
-{
-    public bool? IsActive { get; set; }
-}
-```
-```
+> **Note Phase 1** : La gestion des buses d'impression sera développée en **Phase 3**. La Phase 1 utilise une buse fixe de **0.4mm** pour toutes les impressions. Le choix de la buse a un impact direct sur la durée d'impression et la consommation de plastique, et sera donc implémenté avec l'analyse structurelle avancée en Phase 3.
 
 ### 2.3 Couche Données
 
@@ -1390,8 +1154,9 @@ public class Order
     public Guid MaterialId { get; set; }
     public virtual Material Material { get; set; }
     
-    public Guid NozzleId { get; set; } // Référence vers la buse utilisée
-    public virtual Nozzle Nozzle { get; set; }
+    // Note Phase 1: Buse fixe 0.4mm (pas de référence en DB)
+    // public Guid NozzleId { get; set; }  // Will be added in Phase 3
+    // public virtual Nozzle Nozzle { get; set; }  // Will be added in Phase 3
     
     public string Color { get; set; }
     public PrintQuality Quality { get; set; } // Draft, Standard, HighQuality
@@ -1467,39 +1232,9 @@ public class Material
     public virtual ICollection<ModelMaterial> CompatibleModels { get; set; }
     public virtual ICollection<Order> Orders { get; set; }
 }
-
-// Entité Nozzle (Buse d'impression)
-public class Nozzle
-{
-    [Key]
-    public Guid Id { get; set; }
-    
-    [Required]
-    [MaxLength(50)]
-    public string Name { get; set; } // Ex: "Buse 0.4mm Standard", "Buse 0.2mm Haute Précision"
-    
-    [Required]
-    public double Diameter { get; set; } // Diamètre en mm (0.2, 0.4, 0.6, 0.8, 1.0, etc.)
-    
-    [MaxLength(50)]
-    public string Material { get; set; } // Laiton, Acier trempé, Ruby tip, etc.
-    
-    [MaxLength(500)]
-    public string Description { get; set; }
-    
-    public bool IsActive { get; set; } // Disponible ou non
-    
-    // Note: Propriétés avancées pour phases ultérieures :
-    // - Hauteur de couche min/max
-    // - Vitesse recommandée
-    // - Support matériaux abrasifs
-    
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
-    
-    public virtual ICollection<Order> Orders { get; set; }
-}
 ```
+
+> **Note Phase 1** : L'entité `Nozzle` n'est pas définie en Phase 1. La buse est fixe à 0.4mm et codée en dur dans la logique métier. L'entité sera ajoutée en Phase 3 avec la gestion des buses.
 
 #### 2.3.2 DbContext Configuration
 
@@ -1515,7 +1250,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
     public DbSet<Order> Orders { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Material> Materials { get; set; }
-    public DbSet<Nozzle> Nozzles { get; set; }
+    // DbSet<Nozzle> removed - Phase 1 uses fixed 0.4mm nozzle, will be added in Phase 3
     public DbSet<Review> Reviews { get; set; }
     public DbSet<Favorite> Favorites { get; set; }
 
@@ -1571,14 +1306,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
             entity.Property(e => e.PricePerGram).HasPrecision(10, 4);
         });
 
-        // Configuration Nozzle
-        modelBuilder.Entity<Nozzle>(entity =>
-        {
-            entity.HasIndex(e => e.Diameter);
-            entity.HasIndex(e => e.IsActive);
-            entity.Property(e => e.Name).IsRequired();
-            entity.Property(e => e.Diameter).IsRequired();
-        });
+        // Configuration Nozzle removed - Phase 1 uses fixed 0.4mm nozzle
 
         // Seed des données initiales
         SeedData(modelBuilder);
@@ -1604,63 +1332,11 @@ public class ApplicationDbContext : IdentityDbContext<User>
             new Material { Id = Guid.NewGuid(), Name = "TPU", Description = "Flexible, élastique", PricePerGram = 0.050m, IsAvailable = true },
             new Material { Id = Guid.NewGuid(), Name = "Résine", Description = "Haute précision, détails fins", PricePerGram = 0.080m, IsAvailable = true }
         );
-
-        // Buses (Nozzles)
-        modelBuilder.Entity<Nozzle>().HasData(
-            new Nozzle { 
-                Id = Guid.NewGuid(), 
-                Name = "Buse 0.2mm Haute Précision", 
-                Diameter = 0.2, 
-                Material = "Laiton", 
-                Description = "Pour détails fins et haute résolution",
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            },
-            new Nozzle { 
-                Id = Guid.NewGuid(), 
-                Name = "Buse 0.4mm Standard", 
-                Diameter = 0.4, 
-                Material = "Laiton", 
-                Description = "Buse polyvalente, usage général",
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            },
-            new Nozzle { 
-                Id = Guid.NewGuid(), 
-                Name = "Buse 0.6mm Rapide", 
-                Diameter = 0.6, 
-                Material = "Laiton", 
-                Description = "Pour impressions rapides et objets volumineux",
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            },
-            new Nozzle { 
-                Id = Guid.NewGuid(), 
-                Name = "Buse 0.4mm Acier Trempé", 
-                Diameter = 0.4, 
-                Material = "Acier trempé", 
-                Description = "Buse durcie (matériaux spéciaux pour phases ultérieures)",
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            },
-            new Nozzle { 
-                Id = Guid.NewGuid(), 
-                Name = "Buse 0.8mm Très Rapide", 
-                Diameter = 0.8, 
-                Material = "Laiton", 
-                Description = "Pour prototypes et grands volumes",
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            }
-        );
     }
 }
 ```
+
+> **Note Phase 1** : La table `Nozzles` n'est pas créée en Phase 1. Phase 1 utilise une buse fixe de 0.4mm codée en dur. La table et la gestion des buses seront ajoutées en Phase 3.
 
 #### 2.3.3 Optimisation de la Base de Données pour Millions de Modèles
 
