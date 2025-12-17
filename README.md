@@ -106,6 +106,9 @@ Le projet respecte des **standards de qualité stricts** :
 - **📧 Notification email automatique** pour chaque nouvelle commande reçue
 - 📦 Gestion des commandes en temps réel
 - 🎨 Gestion des modèles 3D
+- 🧱 **Gestion des matériaux** (ajout, modification, prix, couleurs, stock)
+- 🌐 **Gestion des sources de modèles** (configuration des sites web interrogés)
+- 🔄 Monitoring des synchronisations et performance des sources
 - 👥 Gestion des utilisateurs
 - 📈 Rapports et analytics
 

@@ -249,13 +249,70 @@ Une fois validée, la demande est transmise au gestionnaire d'impressions avec :
 - Statistiques de popularité
 - Gestion des catégories et tags
 
-#### 2.7.3 Gestion des Utilisateurs
+#### 2.7.3 Gestion des Matériaux
+**L'administrateur peut gérer les matériaux disponibles pour l'impression** :
+- **Liste des matériaux** :
+  - Vue d'ensemble de tous les matériaux configurés
+  - Informations : nom, type (PLA, ABS, PETG, résine, etc.), couleurs disponibles, prix/gramme
+  - Statut (actif/inactif)
+  - Stock disponible
+- **Ajout de matériaux** :
+  - Nom du matériau
+  - Type et propriétés techniques
+  - Couleurs disponibles (sélection multiple)
+  - Prix au gramme ou au cm³
+  - Température d'impression recommandée
+  - Description et cas d'usage
+  - Photo/icône du matériau
+- **Modification de matériaux** :
+  - Mise à jour des prix
+  - Ajout/suppression de couleurs
+  - Modification des propriétés
+  - Désactivation temporaire si rupture de stock
+- **Suppression de matériaux** :
+  - Vérification des commandes en cours utilisant ce matériau
+  - Archivage plutôt que suppression définitive
+
+#### 2.7.4 Gestion des Sources de Modèles 3D
+**L'administrateur peut configurer les sites web interrogés pour récupérer les modèles** :
+- **Liste des sources actives** :
+  - Vue d'ensemble des sites configurés (Thingiverse, MyMiniFactory, Cults3D, etc.)
+  - Statut (actif/inactif/erreur)
+  - Nombre de modèles indexés par source
+  - Dernière synchronisation
+  - Performance (temps de réponse moyen)
+- **Ajout de sources** :
+  - URL du site ou API
+  - Nom et description
+  - Type d'accès (API, scraping avec respect du robots.txt)
+  - Clé API si nécessaire
+  - Fréquence de synchronisation
+  - Filtres (catégories à inclure/exclure)
+  - Priorité dans les résultats de recherche
+- **Configuration des sources** :
+  - Activation/désactivation temporaire
+  - Modification de la fréquence de sync
+  - Ajustement des filtres
+  - Configuration du rate limiting
+  - Gestion des quotas API
+- **Monitoring des sources** :
+  - Logs de synchronisation
+  - Erreurs et alertes
+  - Statistiques d'utilisation
+  - Qualité des résultats (retours utilisateurs)
+- **Sécurité et conformité** :
+  - Respect des conditions d'utilisation de chaque site
+  - Vérification des licences des modèles
+  - Attribution correcte des sources
+  - Respect du RGPD et des droits d'auteur
+
+#### 2.7.5 Gestion des Utilisateurs
 - Liste des utilisateurs inscrits
 - Modération (bannissement, suspension)
 - Gestion des rôles (utilisateur, administrateur)
 - Statistiques d'utilisation
 
-#### 2.7.4 Statistiques et Rapports
+#### 2.7.6 Statistiques et Rapports
 - Nombre de recherches par jour/mois
 - Modèles les plus demandés
 - Chiffre d'affaires
@@ -963,7 +1020,12 @@ Le développeur travaillera **en temps partiel** sur ce projet, alternant avec d
 - ✅ **Notifications email automatiques à l'imprimeur pour chaque nouvelle commande**
 - ✅ Notifications par email aux utilisateurs
 - ✅ **Messages d'erreur explicites et actionnables**
-- ✅ Tableau de bord admin avec toutes fonctionnalités
+- ✅ Tableau de bord admin avec toutes fonctionnalités :
+  - Gestion des commandes avec notifications email
+  - **Gestion des matériaux** (ajout, modification, suppression, activation/désactivation)
+  - **Gestion des sources de modèles 3D** (configuration des sites web interrogés)
+  - Monitoring des synchronisations et statistiques des sources
+  - Gestion des utilisateurs et rôles
 - ✅ Application web Blazor .NET 10 déployée
 
 ### 10.1.2 Fonctionnels - Phase 2 (Application Mobile)

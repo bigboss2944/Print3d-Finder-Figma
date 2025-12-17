@@ -520,6 +520,544 @@ public class ModelsController : ControllerBase
 }
 ```
 
+#### 2.2.4 Controller Administrateur - Gestion des Matériaux
+
+```csharp
+[ApiController]
+[Route("api/admin/[controller]")]
+[Authorize(Roles = "Admin,SuperAdmin")]
+public class MaterialsController : ControllerBase
+{
+    private readonly IMaterialService _materialService;
+    private readonly ILogger<MaterialsController> _logger;
+
+    public MaterialsController(
+        IMaterialService materialService,
+        ILogger<MaterialsController> logger)
+    {
+        _materialService = materialService;
+        _logger = logger;
+    }
+
+    /// <summary>
+    /// Récupère la liste de tous les matériaux
+    /// </summary>
+    [HttpGet]
+    public async Task<ActionResult<List<MaterialDto>>> GetAll(
+        [FromQuery] bool includeInactive = false)
+    {
+        try
+        {
+            var materials = await _materialService.GetAllAsync(includeInactive);
+            return Ok(materials);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving materials");
+            return StatusCode(500, "Erreur lors de la récupération des matériaux");
+        }
+    }
+
+    /// <summary>
+    /// Récupère un matériau par son ID
+    /// </summary>
+    [HttpGet("{id}")]
+    public async Task<ActionResult<MaterialDto>> GetById(Guid id)
+    {
+        try
+        {
+            var material = await _materialService.GetByIdAsync(id);
+            if (material == null)
+                return NotFound($"Matériau {id} introuvable");
+
+            return Ok(material);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving material {MaterialId}", id);
+            return StatusCode(500, "Erreur lors de la récupération du matériau");
+        }
+    }
+
+    /// <summary>
+    /// Crée un nouveau matériau
+    /// </summary>
+    [HttpPost]
+    public async Task<ActionResult<MaterialDto>> Create(
+        [FromBody] CreateMaterialRequest request)
+    {
+        try
+        {
+            var material = await _materialService.CreateAsync(request);
+            
+            _logger.LogInformation(
+                "Material {MaterialName} created by {UserId}",
+                material.Name,
+                User.FindFirst("sub")?.Value);
+
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = material.Id },
+                material);
+        }
+        catch (ValidationException ex)
+        {
+            return BadRequest(new { message = ex.Message, errors = ex.Errors });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating material");
+            return StatusCode(500, "Erreur lors de la création du matériau");
+        }
+    }
+
+    /// <summary>
+    /// Met à jour un matériau existant
+    /// </summary>
+    [HttpPut("{id}")]
+    public async Task<ActionResult<MaterialDto>> Update(
+        Guid id,
+        [FromBody] UpdateMaterialRequest request)
+    {
+        try
+        {
+            var material = await _materialService.UpdateAsync(id, request);
+            if (material == null)
+                return NotFound($"Matériau {id} introuvable");
+
+            _logger.LogInformation(
+                "Material {MaterialId} updated by {UserId}",
+                id,
+                User.FindFirst("sub")?.Value);
+
+            return Ok(material);
+        }
+        catch (ValidationException ex)
+        {
+            return BadRequest(new { message = ex.Message, errors = ex.Errors });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating material {MaterialId}", id);
+            return StatusCode(500, "Erreur lors de la mise à jour du matériau");
+        }
+    }
+
+    /// <summary>
+    /// Supprime (archive) un matériau
+    /// </summary>
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(Guid id)
+    {
+        try
+        {
+            var result = await _materialService.DeleteAsync(id);
+            if (!result)
+                return NotFound($"Matériau {id} introuvable");
+
+            _logger.LogInformation(
+                "Material {MaterialId} deleted by {UserId}",
+                id,
+                User.FindFirst("sub")?.Value);
+
+            return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting material {MaterialId}", id);
+            return StatusCode(500, "Erreur lors de la suppression du matériau");
+        }
+    }
+
+    /// <summary>
+    /// Active ou désactive un matériau
+    /// </summary>
+    [HttpPatch("{id}/toggle-status")]
+    public async Task<ActionResult> ToggleStatus(Guid id)
+    {
+        try
+        {
+            var result = await _materialService.ToggleStatusAsync(id);
+            if (!result)
+                return NotFound($"Matériau {id} introuvable");
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error toggling material status {MaterialId}", id);
+            return StatusCode(500, "Erreur lors du changement de statut");
+        }
+    }
+}
+
+// DTOs pour les matériaux
+public class MaterialDto
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+    public string Type { get; set; } // PLA, ABS, PETG, Résine, etc.
+    public List<string> AvailableColors { get; set; }
+    public decimal PricePerGram { get; set; }
+    public int? RecommendedTemperature { get; set; }
+    public string Description { get; set; }
+    public string ImageUrl { get; set; }
+    public bool IsActive { get; set; }
+    public int StockQuantity { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+}
+
+public class CreateMaterialRequest
+{
+    [Required(ErrorMessage = "Le nom du matériau est obligatoire")]
+    [MaxLength(100)]
+    public string Name { get; set; }
+
+    [Required(ErrorMessage = "Le type de matériau est obligatoire")]
+    public string Type { get; set; }
+
+    [Required(ErrorMessage = "Au moins une couleur doit être disponible")]
+    public List<string> AvailableColors { get; set; }
+
+    [Required]
+    [Range(0.01, 100, ErrorMessage = "Le prix doit être entre 0.01 et 100€")]
+    public decimal PricePerGram { get; set; }
+
+    [Range(150, 350, ErrorMessage = "La température doit être entre 150 et 350°C")]
+    public int? RecommendedTemperature { get; set; }
+
+    [MaxLength(500)]
+    public string Description { get; set; }
+
+    public string ImageUrl { get; set; }
+    
+    public int StockQuantity { get; set; } = 0;
+}
+
+public class UpdateMaterialRequest : CreateMaterialRequest
+{
+    public bool? IsActive { get; set; }
+}
+```
+
+#### 2.2.5 Controller Administrateur - Gestion des Sources de Modèles
+
+```csharp
+[ApiController]
+[Route("api/admin/[controller]")]
+[Authorize(Roles = "Admin,SuperAdmin")]
+public class ModelSourcesController : ControllerBase
+{
+    private readonly IModelSourceService _sourceService;
+    private readonly ILogger<ModelSourcesController> _logger;
+
+    public ModelSourcesController(
+        IModelSourceService sourceService,
+        ILogger<ModelSourcesController> logger)
+    {
+        _sourceService = sourceService;
+        _logger = logger;
+    }
+
+    /// <summary>
+    /// Récupère la liste de toutes les sources configurées
+    /// </summary>
+    [HttpGet]
+    public async Task<ActionResult<List<ModelSourceDto>>> GetAll()
+    {
+        try
+        {
+            var sources = await _sourceService.GetAllAsync();
+            return Ok(sources);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving model sources");
+            return StatusCode(500, "Erreur lors de la récupération des sources");
+        }
+    }
+
+    /// <summary>
+    /// Récupère une source par son ID
+    /// </summary>
+    [HttpGet("{id}")]
+    public async Task<ActionResult<ModelSourceDto>> GetById(Guid id)
+    {
+        try
+        {
+            var source = await _sourceService.GetByIdAsync(id);
+            if (source == null)
+                return NotFound($"Source {id} introuvable");
+
+            return Ok(source);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving source {SourceId}", id);
+            return StatusCode(500, "Erreur lors de la récupération de la source");
+        }
+    }
+
+    /// <summary>
+    /// Ajoute une nouvelle source de modèles
+    /// </summary>
+    [HttpPost]
+    public async Task<ActionResult<ModelSourceDto>> Create(
+        [FromBody] CreateModelSourceRequest request)
+    {
+        try
+        {
+            var source = await _sourceService.CreateAsync(request);
+            
+            _logger.LogInformation(
+                "Model source {SourceName} created by {UserId}",
+                source.Name,
+                User.FindFirst("sub")?.Value);
+
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = source.Id },
+                source);
+        }
+        catch (ValidationException ex)
+        {
+            return BadRequest(new { message = ex.Message, errors = ex.Errors });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating model source");
+            return StatusCode(500, "Erreur lors de la création de la source");
+        }
+    }
+
+    /// <summary>
+    /// Met à jour une source existante
+    /// </summary>
+    [HttpPut("{id}")]
+    public async Task<ActionResult<ModelSourceDto>> Update(
+        Guid id,
+        [FromBody] UpdateModelSourceRequest request)
+    {
+        try
+        {
+            var source = await _sourceService.UpdateAsync(id, request);
+            if (source == null)
+                return NotFound($"Source {id} introuvable");
+
+            _logger.LogInformation(
+                "Model source {SourceId} updated by {UserId}",
+                id,
+                User.FindFirst("sub")?.Value);
+
+            return Ok(source);
+        }
+        catch (ValidationException ex)
+        {
+            return BadRequest(new { message = ex.Message, errors = ex.Errors });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating source {SourceId}", id);
+            return StatusCode(500, "Erreur lors de la mise à jour de la source");
+        }
+    }
+
+    /// <summary>
+    /// Supprime une source
+    /// </summary>
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(Guid id)
+    {
+        try
+        {
+            var result = await _sourceService.DeleteAsync(id);
+            if (!result)
+                return NotFound($"Source {id} introuvable");
+
+            _logger.LogInformation(
+                "Model source {SourceId} deleted by {UserId}",
+                id,
+                User.FindFirst("sub")?.Value);
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting source {SourceId}", id);
+            return StatusCode(500, "Erreur lors de la suppression de la source");
+        }
+    }
+
+    /// <summary>
+    /// Active ou désactive une source
+    /// </summary>
+    [HttpPatch("{id}/toggle-status")]
+    public async Task<ActionResult> ToggleStatus(Guid id)
+    {
+        try
+        {
+            var result = await _sourceService.ToggleStatusAsync(id);
+            if (!result)
+                return NotFound($"Source {id} introuvable");
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error toggling source status {SourceId}", id);
+            return StatusCode(500, "Erreur lors du changement de statut");
+        }
+    }
+
+    /// <summary>
+    /// Lance une synchronisation manuelle d'une source
+    /// </summary>
+    [HttpPost("{id}/sync")]
+    public async Task<ActionResult<SyncResultDto>> TriggerSync(Guid id)
+    {
+        try
+        {
+            var result = await _sourceService.SyncAsync(id);
+            if (result == null)
+                return NotFound($"Source {id} introuvable");
+
+            _logger.LogInformation(
+                "Manual sync triggered for source {SourceId} by {UserId}",
+                id,
+                User.FindFirst("sub")?.Value);
+
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error syncing source {SourceId}", id);
+            return StatusCode(500, "Erreur lors de la synchronisation");
+        }
+    }
+
+    /// <summary>
+    /// Récupère les statistiques d'une source
+    /// </summary>
+    [HttpGet("{id}/stats")]
+    public async Task<ActionResult<SourceStatsDto>> GetStats(Guid id)
+    {
+        try
+        {
+            var stats = await _sourceService.GetStatsAsync(id);
+            if (stats == null)
+                return NotFound($"Source {id} introuvable");
+
+            return Ok(stats);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving stats for source {SourceId}", id);
+            return StatusCode(500, "Erreur lors de la récupération des statistiques");
+        }
+    }
+}
+
+// DTOs pour les sources de modèles
+public class ModelSourceDto
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+    public string Url { get; set; }
+    public string Description { get; set; }
+    public SourceType Type { get; set; } // API, WebScraping
+    public string ApiKey { get; set; } // Masqué dans les réponses
+    public bool IsActive { get; set; }
+    public int SyncFrequencyHours { get; set; }
+    public DateTime? LastSyncAt { get; set; }
+    public SourceStatus Status { get; set; }
+    public int ModelsCount { get; set; }
+    public int Priority { get; set; }
+    public List<string> AllowedCategories { get; set; }
+    public int RateLimitPerHour { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+}
+
+public class CreateModelSourceRequest
+{
+    [Required(ErrorMessage = "Le nom de la source est obligatoire")]
+    [MaxLength(100)]
+    public string Name { get; set; }
+
+    [Required(ErrorMessage = "L'URL est obligatoire")]
+    [Url(ErrorMessage = "L'URL n'est pas valide")]
+    public string Url { get; set; }
+
+    [MaxLength(500)]
+    public string Description { get; set; }
+
+    [Required]
+    public SourceType Type { get; set; }
+
+    public string ApiKey { get; set; }
+
+    [Range(1, 168, ErrorMessage = "La fréquence doit être entre 1 et 168 heures")]
+    public int SyncFrequencyHours { get; set; } = 24;
+
+    [Range(1, 10, ErrorMessage = "La priorité doit être entre 1 et 10")]
+    public int Priority { get; set; } = 5;
+
+    public List<string> AllowedCategories { get; set; } = new();
+
+    [Range(10, 10000, ErrorMessage = "Le rate limit doit être entre 10 et 10000 requêtes/heure")]
+    public int RateLimitPerHour { get; set; } = 100;
+}
+
+public class UpdateModelSourceRequest : CreateModelSourceRequest
+{
+    public bool? IsActive { get; set; }
+}
+
+public class SyncResultDto
+{
+    public Guid SourceId { get; set; }
+    public DateTime StartedAt { get; set; }
+    public DateTime CompletedAt { get; set; }
+    public int ModelsAdded { get; set; }
+    public int ModelsUpdated { get; set; }
+    public int ModelsDeleted { get; set; }
+    public int Errors { get; set; }
+    public List<string> ErrorMessages { get; set; }
+}
+
+public class SourceStatsDto
+{
+    public Guid SourceId { get; set; }
+    public int TotalModels { get; set; }
+    public int ModelsLastMonth { get; set; }
+    public int AverageResponseTimeMs { get; set; }
+    public double SuccessRate { get; set; }
+    public DateTime? LastSuccessfulSync { get; set; }
+    public int UserSearchCount { get; set; }
+    public double UserSatisfactionRate { get; set; }
+}
+
+public enum SourceType
+{
+    API,
+    WebScraping
+}
+
+public enum SourceStatus
+{
+    Active,
+    Inactive,
+    Error,
+    Syncing
+}
+```
+```
+
 ### 2.3 Couche Données
 
 #### 2.3.1 Modèle de Données (Entity Framework Core)
