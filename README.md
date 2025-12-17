@@ -2,6 +2,8 @@
 
 **Plateforme de recherche et d'impression de modèles 3D**
 
+> 📚 **[Guide de Documentation Complète](./DOCUMENTATION_INDEX.md)** - Consultez l'index pour naviguer facilement dans toute la documentation
+
 ## 📋 Description
 
 Print3D Finder est une application web et mobile permettant aux utilisateurs de rechercher des modèles 3D à imprimer via :
