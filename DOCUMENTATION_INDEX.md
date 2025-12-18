@@ -93,23 +93,23 @@ Ce dépôt contient la documentation complète pour le projet **Print3D Finder**
 - Marge de sécurité de 20% incluse
 - Adaptation au développement temps partiel (~50%)
 
-**Phase 1 - Conception et Préparation** (20 jours effectifs)
+**Phase 1 - Conception et Préparation** (19 jours effectifs)
 - 1.1 Finalisation cahier des charges (3 jours)
 - 1.2 Design UI/UX avec images libres de droits (7 jours)
 - 1.3 Architecture technique détaillée (6 jours)
 - 1.4 Sélection et vérification packages (2 jours)
-- 1.5 Configuration de l'environnement de développement (1.25 jours)
+- 1.5 Configuration de l'environnement de développement (1 jours)
   
-**Phase 2 - Développement Backend** (22.5 jours effectifs)
+**Phase 2 - Développement Backend** (18.5 jours effectifs)
 - 2.1 Infrastructure et configuration base (3 jours)
-- 2.2 Authentification et gestion utilisateurs (7 jours, TDD)
+- 2.2 Authentification et gestion utilisateurs (3 jours, TDD)
 - 2.3 Moteur de recherche textuelle (3 jours, TDD)
 - 2.4 Recherche par image avec IA (2 jours, TDD)
 - 2.5 Gestion des commandes (1.5 jours, TDD)
 - 2.6 Système notification email (3 jours, TDD)
 - 2.7 Tests Unitaires Backend (3 jours intégrés en TDD)
   
-**Phase 3 - Développement Frontend Blazor** (15 jours effectifs)
+**Phase 3 - Développement Frontend Blazor** (21 jours effectifs)
 - 3.1 Setup et configuration Blazor (1 jours)
 - 3.2 Services et état application (3 jours)
 - 3.3 Pages authentification (1.5 jours)
@@ -120,10 +120,10 @@ Ce dépôt contient la documentation complète pour le projet **Print3D Finder**
 - 3.8 Panneau administrateur (2.5 jours)
 - 3.9 Tests E2E frontend (2 jours)
 
-**Phase 4 - Tests et Optimisations** (10 jours effectifs)
+**Phase 4 - Tests et Optimisations** (14 jours effectifs)
 - 4.1 Complétion couverture tests (2.75 jours)
 - 4.2 Tests de charge et performance (5 jours)
-- 4.3 Tests de sécurité (3.5 jours)
+- 4.3 Tests de sécurité (2.5 jours)
 - 4.4 Corrections de bugs (2.25 jours)
 - 4.5 Optimisations (1.5 jours)
 
@@ -136,8 +136,8 @@ Ce dépôt contient la documentation complète pour le projet **Print3D Finder**
 - 5.6 Lancement beta (1 jour)
 
 **Récapitulatif**
-- Total: 60 jours effectifs (12 semaines temps plein)
-- Durée calendaire: 12 semaines (3 mois temps plein)
+- Total: 77.5 jours effectifs (15 semaines temps plein)
+- Durée calendaire: 15 semaines (3 mois temps plein)
 - 115+ sous-tâches détaillées
 - Chemin critique identifié
 - Risques et mitigation documentés
