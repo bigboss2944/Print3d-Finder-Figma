@@ -12,7 +12,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 ---
 
 ## Phase 1 : Conception et Préparation
-**Durée totale : 20 jours effectifs (≈ 8-10 semaines calendaires)**
+**Durée totale : 20 jours effectifs (≈ 4 semaines calendaires)**
 
 ### 1.1 Finalisation du Cahier des Charges (3 jours)
 
@@ -40,42 +40,15 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 1.1.2
 - **Livrable:** 20-30 user stories documentées
 
-### 1.2 Design UI/UX avec Images Libres de Droits (5 jours)
+### 1.2 Design UI/UX avec Images Libres de Droits (7 jours)
 
-#### 1.2.1 Recherche et benchmark concurrents (1 jour)
-- Analyse de 5-10 plateformes similaires
-- Identification des bonnes pratiques UX
-- Capture des patterns UI efficaces
-- Documentation des points de friction
-- **Dépendances:** 1.1.2
-- **Livrable:** Rapport de benchmark avec screenshots
-
-#### 1.2.2 Création des wireframes (2 jours)
-- Wireframes basse-fidélité pour toutes les pages clés
-  - Page d'accueil et recherche (0.5 jour)
-  - Résultats et détails de modèle (0.5 jour)
-  - Processus de commande (0.5 jour)
-  - Tableaux de bord (utilisateur et admin) (0.5 jour)
-- Flux de navigation complet
-- Wireframes responsive (desktop, tablet, mobile)
-- **Dépendances:** 1.2.1
-- **Livrable:** 15-20 wireframes Figma/Sketch
-
-#### 1.2.3 Maquettes haute-fidélité (1.5 jours)
+#### 1.2.1 Maquettes haute-fidélité (7 jours)
 - Design system (couleurs, typographie, composants)
 - Maquettes desktop pour pages principales
 - Maquettes mobile pour pages principales
 - États interactifs (hover, focus, disabled)
 - **Dépendances:** 1.2.2
 - **Livrable:** Fichier Figma complet avec design system
-
-#### 1.2.4 Sélection et documentation des images libres de droits (0.5 jour)
-- Recherche sur Unsplash, Pexels, Pixabay
-- Sélection de 20-30 images pour illustrations
-- Documentation des sources et licences
-- Organisation dans bibliothèque d'assets
-- **Dépendances:** 1.2.3
-- **Livrable:** Bibliothèque d'images avec attributions
 
 ### 1.3 Architecture Technique Détaillée (6 jours)
 
@@ -122,9 +95,9 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 1.3.3
 - **Livrable:** Plan de tests et conventions
 
-### 1.4 Sélection et Vérification des Packages (4 jours)
+### 1.4 Sélection et Vérification des Packages (2 jours)
 
-#### 1.4.1 Identification des packages nécessaires (1 jour)
+#### 1.4.1 Identification des packages nécessaires (0.5 jour)
 - Liste exhaustive des besoins par domaine
   - UI: MudBlazor vs Tailwind CSS
   - Base de données: Entity Framework Core
@@ -136,7 +109,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 1.3.1
 - **Livrable:** Liste catégorisée de packages
 
-#### 1.4.2 Évaluation et validation des packages (2 jours)
+#### 1.4.2 Évaluation et validation des packages (0.5 jours)
 - Pour chaque package candidat:
   - Vérification de la licence (MIT, Apache 2.0, BSD)
   - Activité du projet (commits, issues, releases)
@@ -164,17 +137,14 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 1.4.3
 - **Livrable:** Document de dépendances approuvées
 
-### 1.5 Configuration de l'Environnement de Développement (2 jours)
+### 1.5 Configuration de l'Environnement de Développement (1.25 jours)
 
-#### 1.5.1 Setup des outils de développement (0.5 jour)
-- Installation Visual Studio 2022 / VS Code
-- Configuration extensions recommandées
-- Installation .NET 10 SDK
+#### 1.5.1 Setup des outils de développement (0.25 jour)
 - Configuration git et conventions
 - **Dépendances:** Aucune
 - **Livrable:** Guide d'installation pour l'équipe
 
-#### 1.5.2 Création de la structure de solution .NET (1 jour)
+#### 1.5.2 Création de la structure de solution .NET (0.5 jour)
 - Création des projets (API, Blazor, Shared, Tests)
 - Configuration .editorconfig
 - Configuration StyleCop et analyzers
@@ -196,9 +166,9 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 ## Phase 2 : Développement Backend
 **Durée totale : 40 jours effectifs (≈ 16-20 semaines calendaires)**
 
-### 2.1 Infrastructure et Configuration de Base (4 jours)
+### 2.1 Infrastructure et Configuration de Base (3 jours)
 
-#### 2.1.1 Setup du projet API ASP.NET Core (1 jour)
+#### 2.1.1 Setup du projet API ASP.NET Core (0.5 jour)
 - Création projet ASP.NET Core Web API .NET 10
 - Configuration Program.cs et Startup
 - Configuration Swagger/OpenAPI
@@ -207,7 +177,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** Phase 1
 - **Livrable:** API fonctionnelle "Hello World"
 
-#### 2.1.2 Configuration Entity Framework Core (1.5 jours)
+#### 2.1.2 Configuration Entity Framework Core (1 jours)
 - Setup DbContext et connexion
 - Configuration des entités de base
 - Migrations initiales
@@ -215,14 +185,14 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 2.1.1
 - **Livrable:** Base de données initialisée
 
-#### 2.1.3 Configuration Redis et cache distribué (0.5 jour)
+#### 2.1.3 Configuration Redis et cache distribué (1 jour)
 - Installation et configuration Redis
 - Integration avec ASP.NET Core
 - Configuration des politiques de cache
 - **Dépendances:** 2.1.1
 - **Livrable:** Cache opérationnel
 
-#### 2.1.4 Middleware et pipeline HTTP (1 jour)
+#### 2.1.4 Middleware et pipeline HTTP (0.5 jour)
 - Middleware de gestion d'erreurs globale
 - Middleware de logging des requêtes
 - Configuration rate limiting
@@ -261,26 +231,26 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Livrable:** Noms utilisateurs sécurisés
 
 #### 2.2.4 Endpoints d'authentification (2 jours - TDD)
-- Tests + Implémentation: POST /auth/register (0.5 jour)
-- Tests + Implémentation: POST /auth/login (0.5 jour)
-- Tests + Implémentation: POST /auth/refresh (0.3 jour)
-- Tests + Implémentation: POST /auth/logout (0.2 jour)
-- Tests + Implémentation: POST /auth/change-password (0.3 jour)
-- Tests + Implémentation: POST /auth/forgot-password (0.2 jour)
+- Tests + Implémentation: POST /auth/register (0.50 jour)
+- Tests + Implémentation: POST /auth/login (0.25 jour)
+- Tests + Implémentation: POST /auth/refresh (0.25 jour)
+- Tests + Implémentation: POST /auth/logout (0.25 jour)
+- Tests + Implémentation: POST /auth/change-password (0.25 jour)
+- Tests + Implémentation: POST /auth/forgot-password (0.25 jour)
 - **Dépendances:** 2.2.2, 2.2.3
 - **Livrable:** API auth complète avec tests 80%+
 
 #### 2.2.5 Gestion des utilisateurs (1.5 jours - TDD)
-- Tests + Implémentation: GET /users/profile (0.3 jour)
-- Tests + Implémentation: PUT /users/profile (0.4 jour)
-- Tests + Implémentation: DELETE /users/account (0.3 jour)
-- Tests + Implémentation: RGPD export données (0.5 jour)
+- Tests + Implémentation: GET /users/profile (0.25 jour)
+- Tests + Implémentation: PUT /users/profile (0.25 jour)
+- Tests + Implémentation: DELETE /users/account (0.25 jour)
+- Tests + Implémentation: RGPD export données (0.75 jour)
 - **Dépendances:** 2.2.4
 - **Livrable:** Gestion utilisateurs conforme RGPD
 
-### 2.3 Moteur de Recherche Textuelle (5 jours)
+### 2.3 Moteur de Recherche Textuelle (3 jours)
 
-#### 2.3.1 Setup Elasticsearch/Azure Cognitive Search (1 jour)
+#### 2.3.1 Setup Elasticsearch/Azure Cognitive Search (0.5 jour)
 - Installation et configuration Elasticsearch
 - Configuration des index
 - Mapping des champs de recherche
@@ -288,7 +258,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 2.1.2
 - **Livrable:** Moteur de recherche opérationnel
 
-#### 2.3.2 Indexation des modèles 3D (1.5 jours - TDD)
+#### 2.3.2 Indexation des modèles 3D (1 jours - TDD)
 - Tests: Service d'indexation
 - Implémentation: Indexation initiale bulk
 - Tests: Indexation incrémentale (add/update/delete)
@@ -297,7 +267,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 2.3.1
 - **Livrable:** Pipeline d'indexation automatique
 
-#### 2.3.3 API de recherche textuelle (2 jours - TDD)
+#### 2.3.3 API de recherche textuelle (1 jours - TDD)
 - Tests + Implémentation: GET /search?q=... (0.8 jour)
   - Recherche full-text
   - Scoring et pertinence
@@ -317,9 +287,9 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 2.3.3
 - **Livrable:** Recherche scalable <50ms
 
-### 2.4 Recherche par Image avec IA (4 jours)
+### 2.4 Recherche par Image avec IA (2.5 jours)
 
-#### 2.4.1 Configuration Azure Computer Vision API (0.5 jour)
+#### 2.4.1 Configuration Anthropic (0.5 jour)
 - Création ressource Azure
 - Configuration des clés API
 - Tests de connexion
@@ -327,7 +297,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 2.1.1
 - **Livrable:** Service IA opérationnel
 
-#### 2.4.2 Service de compression d'images (1 jour - TDD)
+#### 2.4.2 Service de compression d'images (0.5 jour - TDD)
 - Tests: Compression automatique au upload
 - Implémentation: ImageSharp/SkiaSharp
 - Tests: Conversion en WebP + fallback JPG
@@ -337,7 +307,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 2.1.1
 - **Livrable:** Images optimisées automatiquement
 
-#### 2.4.3 Upload et analyse d'images (1.5 jours - TDD)
+#### 2.4.3 Upload et analyse d'images (1 jours - TDD)
 - Tests + Implémentation: POST /search/image (0.5 jour)
   - Validation format (JPG, PNG, HEIC)
   - Limite 10MB
@@ -347,7 +317,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 2.4.1, 2.4.2
 - **Livrable:** Upload d'images sécurisé
 
-#### 2.4.4 Matching et résultats (1 jour - TDD)
+#### 2.4.4 Matching et résultats (0.5 jour - TDD)
 - Tests: Comparaison features visuelles
 - Implémentation: Algorithme de similarité
 - Tests: Scoring et ranking des résultats
@@ -356,85 +326,54 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 2.4.3
 - **Livrable:** Recherche par image fonctionnelle
 
-### 2.5 Gestion des Modèles 3D (5 jours)
+### 2.5 Gestion des Commandes (3 jours)
 
-#### 2.5.1 CRUD des modèles 3D (2 jours - TDD)
-- Tests + Implémentation: GET /models (0.4 jour)
-- Tests + Implémentation: GET /models/{id} (0.4 jour)
-- Tests + Implémentation: POST /models [Admin] (0.5 jour)
-- Tests + Implémentation: PUT /models/{id} [Admin] (0.4 jour)
-- Tests + Implémentation: DELETE /models/{id} [Admin] (0.3 jour)
-- **Dépendances:** 2.1.2, 2.2.4
-- **Livrable:** API CRUD complète avec autorisation
-
-#### 2.5.2 Upload de fichiers 3D vers stockage cloud (1.5 jours - TDD)
-- Tests: Upload vers Azure Blob/S3
-- Implémentation: Service de stockage
-- Tests: Validation formats (STL, OBJ, 3MF)
-- Tests: Limite 50MB
-- Implémentation: Upload avec progression
-- Tests: Génération URLs signées
-- **Dépendances:** 2.5.1
-- **Livrable:** Gestion fichiers 3D sécurisée
-
-#### 2.5.3 Analyse basique de modèles 3D (Phase 1) (1.5 jours - TDD)
-- Tests: Extraction dimensions (L x l x h)
-- Implémentation: Parser STL/OBJ basique
-- Tests: Calcul du volume
-- Implémentation: Estimation temps d'impression
-- Tests: Calcul coût matière
-- Tests: Vérification compatibilité volume impression
-- **Dépendances:** 2.5.2
-- **Livrable:** Analyse printabilité basique
-
-### 2.6 Gestion des Commandes (6 jours)
-
-#### 2.6.1 CRUD des commandes (2.5 jours - TDD)
-- Tests + Implémentation: POST /orders (0.8 jour)
+#### 2.5.1 CRUD des commandes (0.5 jours - TDD)
+- Tests + Implémentation: POST /orders
   - Validation complète des données
   - Calcul coût total
   - Génération OrderNumber unique
-- Tests + Implémentation: GET /orders [User] (0.4 jour)
-- Tests + Implémentation: GET /orders/{id} (0.4 jour)
-- Tests + Implémentation: PUT /orders/{id}/status [Admin] (0.5 jour)
-- Tests + Implémentation: GET /orders [Admin - toutes] (0.4 jour)
+- Tests + Implémentation: GET /orders [User]
+- Tests + Implémentation: GET /orders/{id}
+- Tests + Implémentation: PUT /orders/{id}/status [Admin]
+- Tests + Implémentation: GET /orders [Admin - toutes]
 - **Dépendances:** 2.2.4, 2.5.1
 - **Livrable:** API commandes complète
 
-#### 2.6.2 Gestion des matériaux (1.5 jours - TDD)
-- Tests + Implémentation: CRUD matériaux [Admin] (1 jour)
+#### 2.5.2 Gestion des matériaux (0.5 jours - TDD)
+- Tests + Implémentation: CRUD matériaux [Admin]
   - GET /admin/materials
   - POST /admin/materials
   - PUT /admin/materials/{id}
   - DELETE /admin/materials/{id}
   - PATCH /admin/materials/{id}/toggle-status
-- Tests + Implémentation: GET /materials [Public] (0.5 jour)
+- Tests + Implémentation: GET /materials [Public] 
 - **Dépendances:** 2.1.2
 - **Livrable:** Gestion matériaux complète
 
-#### 2.6.3 Gestion des sources de modèles (2 jours - TDD)
-- Tests + Implémentation: CRUD sources [Admin] (1.2 jours)
+#### 2.5.3 Gestion des sources de modèles (0.5 jours - TDD)
+- Tests + Implémentation: CRUD sources [Admin]
   - GET /admin/model-sources
   - POST /admin/model-sources
   - PUT /admin/model-sources/{id}
   - DELETE /admin/model-sources/{id}
   - PATCH /admin/model-sources/{id}/toggle-status
-- Tests + Implémentation: POST /admin/model-sources/{id}/sync (0.5 jour)
-- Tests + Implémentation: GET /admin/model-sources/{id}/stats (0.3 jour)
+- Tests + Implémentation: POST /admin/model-sources/{id}/sync
+- Tests + Implémentation: GET /admin/model-sources/{id}/stats
 - **Dépendances:** 2.1.2, 2.5.1
 - **Livrable:** Configuration sources externe
 
-### 2.7 Système de Notification Email (3 jours)
+### 2.6 Système de Notification Email (3 jours)
 
-#### 2.7.1 Configuration SendGrid/Azure Communication (0.5 jour)
-- Création compte SendGrid
+#### 2.6.1 Configuration Serveur Envoi Email (0.5 jour)
+- Création serveur d'Envoi d'email
 - Configuration clés API
 - Configuration domaine et SPF/DKIM
 - Vérification emails
 - **Dépendances:** 2.1.1
 - **Livrable:** Service email opérationnel
 
-#### 2.7.2 Service de notification email (1.5 jours - TDD)
+#### 2.6.2 Service de notification email (1 jours - TDD)
 - Tests: Template email HTML
 - Implémentation: Générateur de templates
 - Tests: Envoi email nouvelle commande à admin
@@ -446,7 +385,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 2.7.1
 - **Livrable:** Service notifications robuste
 
-#### 2.7.3 Intégration avec workflow commandes (1 jour - TDD)
+#### 2.6.3 Intégration avec workflow commandes (1 jour - TDD)
 - Tests: Notification auto à création commande
 - Implémentation: Hook dans OrderService.Create
 - Tests: Notification à chaque changement statut
@@ -455,11 +394,11 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 2.6.1, 2.7.2
 - **Livrable:** Notifications automatiques fonctionnelles
 
-### 2.8 Tests Unitaires Backend (6 jours intégrés en TDD)
+### 2.7 Tests Unitaires Backend (3 jours intégrés en TDD)
 
 **Note:** Les tests sont développés en TDD tout au long du développement (intégrés dans estimations ci-dessus). Cette section couvre la complétion finale de la couverture.
 
-#### 2.8.1 Complétion couverture de code (2 jours)
+#### 2.7.1 Complétion couverture de code (0.5 jours)
 - Analyse de couverture actuelle
 - Identification des gaps (<70%)
 - Ajout tests manquants pour atteindre 80%+
@@ -467,7 +406,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** Toutes les sous-sections de Phase 2
 - **Livrable:** Couverture ≥80%
 
-#### 2.8.2 Tests d'intégration API (2 jours)
+#### 2.7.2 Tests d'intégration API (0.5 jours)
 - Tests end-to-end des flows principaux
 - Tests avec base de données réelle
 - Tests d'authentification intégrée
@@ -475,7 +414,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 2.8.1
 - **Livrable:** Suite de tests d'intégration
 
-#### 2.8.3 Setup CI/CD avec tests automatiques (1 jour)
+#### 2.7.3 Setup CI/CD avec tests automatiques (1 jour)
 - Configuration GitHub Actions
 - Exécution tests à chaque commit
 - Rapports de couverture automatiques
@@ -483,7 +422,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 2.8.2
 - **Livrable:** Pipeline CI/CD opérationnel
 
-#### 2.8.4 Documentation API (1 jour)
+#### 2.7.4 Documentation API (1 jour)
 - Finalisation Swagger/OpenAPI
 - Exemples de requêtes/réponses
 - Documentation des codes d'erreur
@@ -496,9 +435,9 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 ## Phase 3 : Développement Frontend Web Blazor
 **Durée totale : 30 jours effectifs (≈ 12-15 semaines calendaires)**
 
-### 3.1 Setup et Configuration Blazor (3 jours)
+### 3.1 Setup et Configuration Blazor (1 jours)
 
-#### 3.1.1 Création projet Blazor .NET 10 (1 jour)
+#### 3.1.1 Création projet Blazor .NET 10 (0.25 jour)
 - Choix Blazor WebAssembly vs Server (décision phase 1)
 - Création du projet Blazor
 - Configuration appsettings
@@ -506,7 +445,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** Phase 1, 2.1.1
 - **Livrable:** Projet Blazor fonctionnel
 
-#### 3.1.2 Configuration MudBlazor ou Tailwind CSS (1 jour)
+#### 3.1.2 Configuration MudBlazor ou Tailwind CSS (0.25 jour)
 - Installation package UI choisi
 - Configuration thème et styles
 - Setup composants de base
@@ -514,7 +453,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 3.1.1
 - **Livrable:** UI framework intégré
 
-#### 3.1.3 Configuration bibliothèque partagée (1 jour)
+#### 3.1.3 Configuration bibliothèque partagée (0.25 jour)
 - Création projet Print3DFinder.Shared
 - Migration DTOs depuis backend
 - Configuration références
@@ -548,9 +487,9 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 3.2.2
 - **Livrable:** State management centralisé
 
-### 3.3 Pages d'Authentification (3 jours)
+### 3.3 Pages d'Authentification (1.5 jours)
 
-#### 3.3.1 Page de connexion (1 jour)
+#### 3.3.1 Page de connexion (0.5 jour)
 - Composant Login.razor
 - Formulaire avec validation
 - Gestion erreurs (messages explicites)
@@ -559,7 +498,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 3.2.2, 1.2.3
 - **Livrable:** Page login fonctionnelle
 
-#### 3.3.2 Page d'inscription (1 jour)
+#### 3.3.2 Page d'inscription (0.5 jour)
 - Composant Register.razor
 - Formulaire multi-étapes si besoin
 - Validation côté client (FluentValidation)
@@ -568,7 +507,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 3.2.2
 - **Livrable:** Page register fonctionnelle
 
-#### 3.3.3 Pages de récupération mot de passe (1 jour)
+#### 3.3.3 Pages de récupération mot de passe (0.5 jour)
 - Composant ForgotPassword.razor
 - Composant ResetPassword.razor
 - Workflow email de reset
@@ -576,7 +515,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 3.2.2
 - **Livrable:** Récupération mdp fonctionnelle
 
-### 3.4 Interface de Recherche (5 jours)
+### 3.4 Interface de Recherche (3.5 jours)
 
 #### 3.4.1 Barre de recherche textuelle (1.5 jours)
 - Composant SearchBar.razor
@@ -587,7 +526,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 3.2.1, 2.3.3
 - **Livrable:** Recherche textuelle fonctionnelle
 
-#### 3.4.2 Upload et recherche par photo (2 jours)
+#### 3.4.2 Upload et recherche par photo (1 jours)
 - Composant ImageUpload.razor
 - Drag & drop d'image
 - Prévisualisation avant envoi
@@ -598,7 +537,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 3.2.1, 2.4.3
 - **Livrable:** Recherche photo fonctionnelle
 
-#### 3.4.3 Filtres avancés (1.5 jours)
+#### 3.4.3 Filtres avancés (1 jours)
 - Composant Filters.razor
 - Filtres catégorie, matériaux, dimensions
 - Filtres prix et popularité
@@ -608,9 +547,9 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 3.4.1, 2.3.3
 - **Livrable:** Filtres avancés fonctionnels
 
-### 3.5 Affichage des Résultats (4 jours)
+### 3.5 Affichage des Résultats (3 jours)
 
-#### 3.5.1 Liste/Grille de résultats (1.5 jours)
+#### 3.5.1 Liste/Grille de résultats (1 jours)
 - Composant SearchResults.razor
 - Vue grille avec thumbnails
 - Vue liste alternative
@@ -629,7 +568,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 3.5.1
 - **Livrable:** Tri et pagination fonctionnels
 
-#### 3.5.3 Page détails de modèle (1.5 jours)
+#### 3.5.3 Page détails de modèle (1 jours)
 - Composant ModelDetails.razor
 - Galerie d'images (multiples angles)
 - Affichage métadonnées (dimensions, auteur, licence)
@@ -642,7 +581,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 
 ### 3.6 Workflow de Commande (5 jours)
 
-#### 3.6.1 Configuration impression (2 jours)
+#### 3.6.1 Configuration impression (1 jours)
 - Composant PrintConfiguration.razor
 - Sélection matériau (liste dynamique depuis API)
 - Sélection couleur
@@ -655,7 +594,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 3.5.3, 2.6.1, 2.6.2
 - **Livrable:** Configuration impression fonctionnelle
 
-#### 3.6.2 Récapitulatif commande (1.5 jours)
+#### 3.6.2 Récapitulatif commande (0.5 jours)
 - Composant OrderSummary.razor
 - Affichage complet de la configuration
 - Détail des coûts (matériau, main d'œuvre, livraison)
@@ -665,7 +604,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 3.6.1
 - **Livrable:** Récapitulatif commande fonctionnel
 
-#### 3.6.3 Confirmation et envoi (1.5 jours)
+#### 3.6.3 Confirmation et envoi (1 jours)
 - Composant OrderConfirmation.razor
 - Conditions générales de vente
 - Bouton validation finale
@@ -676,9 +615,9 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 3.6.2, 2.6.1, 2.7.2
 - **Livrable:** Workflow commande complet
 
-### 3.7 Tableau de Bord Utilisateur (3 jours)
+### 3.7 Tableau de Bord Utilisateur (2 jours)
 
-#### 3.7.1 Profil utilisateur (1 jour)
+#### 3.7.1 Profil utilisateur (0.5 jour)
 - Composant UserProfile.razor
 - Affichage informations personnelles
 - Formulaire modification profil
@@ -687,7 +626,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 3.2.2, 2.2.5
 - **Livrable:** Profil utilisateur fonctionnel
 
-#### 3.7.2 Historique des commandes (1.5 jours)
+#### 3.7.2 Historique des commandes (1 jours)
 - Composant OrderHistory.razor
 - Liste des commandes avec statuts
 - Filtres par statut et date
@@ -705,7 +644,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 3.7.1
 - **Livrable:** Gestion favoris fonctionnelle
 
-### 3.8 Panneau Administrateur (5 jours)
+### 3.8 Panneau Administrateur (2.5 jours)
 
 #### 3.8.1 Dashboard admin (1 jour)
 - Composant AdminDashboard.razor
@@ -716,7 +655,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 3.2.2, 2.6.1
 - **Livrable:** Dashboard admin fonctionnel
 
-#### 3.8.2 Gestion des commandes (1.5 jours)
+#### 3.8.2 Gestion des commandes (0.5 jours)
 - Composant AdminOrders.razor
 - Liste toutes commandes avec filtres
 - Changement de statut
@@ -726,7 +665,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 3.8.1, 2.6.1, 2.7.2
 - **Livrable:** Gestion commandes admin
 
-#### 3.8.3 Gestion des matériaux (1 jour)
+#### 3.8.3 Gestion des matériaux (0.5 jour)
 - Composant AdminMaterials.razor
 - Liste, ajout, modification, suppression
 - Activation/désactivation
@@ -735,7 +674,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 3.8.1, 2.6.2
 - **Livrable:** Gestion matériaux admin
 
-#### 3.8.4 Gestion des sources de modèles (1.5 jours)
+#### 3.8.4 Gestion des sources de modèles (0.5 jours)
 - Composant AdminModelSources.razor
 - Liste, ajout, modification, suppression sources
 - Configuration sync et rate limiting
@@ -767,9 +706,9 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 ## Phase 4 : Tests et Optimisations
 **Durée totale : 20 jours effectifs (≈ 8-10 semaines calendaires)**
 
-### 4.1 Complétion de la Couverture de Tests (4 jours)
+### 4.1 Complétion de la Couverture de Tests (2.75 jours)
 
-#### 4.1.1 Analyse de couverture globale (0.5 jour)
+#### 4.1.1 Analyse de couverture globale (0.25 jour)
 - Rapport de couverture backend
 - Rapport de couverture frontend (si applicable)
 - Identification des gaps critiques
@@ -777,7 +716,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** Phase 2, Phase 3
 - **Livrable:** Rapport d'analyse de couverture
 
-#### 4.1.2 Ajout tests unitaires manquants (2 jours)
+#### 4.1.2 Ajout tests unitaires manquants (1 jours)
 - Backend: Complétion à 80%+ (1 jour)
 - Frontend: Tests composants critiques (1 jour)
 - Tests edge cases
@@ -835,7 +774,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** Phase 3
 - **Livrable:** Rapport performance frontend
 
-### 4.3 Tests de Sécurité (6 jours)
+### 4.3 Tests de Sécurité (3.5 jours)
 
 #### 4.3.1 Configuration environnement de tests sécurité (0.5 jour)
 - Installation OWASP ZAP ou Burp Suite
@@ -844,7 +783,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** Phase 2, Phase 3
 - **Livrable:** Environnement tests sécurité
 
-#### 4.3.2 Tests HTTPS et TLS (1 jour)
+#### 4.3.2 Tests HTTPS et TLS (0.5 jour)
 - Validation certificat SSL
 - Test HSTS (Strict-Transport-Security)
 - Test redirection HTTP → HTTPS
@@ -853,7 +792,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 4.3.1
 - **Livrable:** Rapport conformité HTTPS
 
-#### 4.3.3 Tests d'authentification (1.5 jours)
+#### 4.3.3 Tests d'authentification (0.5 jours)
 - Test force brute (rate limiting)
 - Test expiration tokens JWT
 - Test refresh tokens
@@ -863,7 +802,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 4.3.1, 2.2.4
 - **Livrable:** Rapport sécurité authentification
 
-#### 4.3.4 Tests de protection des données (1 jour)
+#### 4.3.4 Tests de protection des données (0.5 jour)
 - Validation chiffrement noms utilisateurs
 - Test pas de credentials dans logs
 - Test masquage emails dans logs
@@ -872,7 +811,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 4.3.3, 2.2.3
 - **Livrable:** Rapport conformité RGPD
 
-#### 4.3.5 Tests upload de fichiers (1 jour)
+#### 4.3.5 Tests upload de fichiers (0.5 jour)
 - Test validation formats fichiers
 - Test limites de taille (10MB/50MB)
 - Test scan antivirus (simulation malware)
@@ -890,9 +829,9 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 4.3.2, 4.3.3, 4.3.4, 4.3.5
 - **Livrable:** Rapport d'audit complet
 
-### 4.4 Corrections de Bugs (3 jours)
+### 4.4 Corrections de Bugs (2.25 jours)
 
-#### 4.4.1 Triage et priorisation des bugs (0.5 jour)
+#### 4.4.1 Triage et priorisation des bugs (0.25 jour)
 - Revue backlog bugs
 - Classification (critique, majeur, mineur)
 - Priorisation selon impact
@@ -900,7 +839,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 4.1, 4.2, 4.3
 - **Livrable:** Backlog bugs priorisé
 
-#### 4.4.2 Corrections bugs critiques (1.5 jours)
+#### 4.4.2 Corrections bugs critiques (1 jours)
 - Bugs de sécurité
 - Bugs bloquants fonctionnalité
 - Bugs avec perte de données
@@ -916,9 +855,9 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 4.4.2
 - **Livrable:** Backlog bugs nettoyé
 
-### 4.5 Optimisations (2 jours)
+### 4.5 Optimisations (1.5 jours)
 
-#### 4.5.1 Optimisations base de données (0.8 jour)
+#### 4.5.1 Optimisations base de données (0.25 jour)
 - Ajout index manquants
 - Optimisation requêtes N+1
 - Configuration paramètres PostgreSQL
@@ -926,7 +865,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 4.2.2
 - **Livrable:** DB optimisée
 
-#### 4.5.2 Optimisations cache (0.7 jour)
+#### 4.5.2 Optimisations cache (0.25 jour)
 - Configuration cache distribué Redis
 - Stratégie de cache par feature
 - Cache des résultats recherche fréquents
@@ -934,7 +873,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 4.2.2
 - **Livrable:** Stratégie cache efficace
 
-#### 4.5.3 Optimisations frontend (0.5 jour)
+#### 4.5.3 Optimisations frontend (1 jour)
 - Lazy loading composants
 - Code splitting Blazor
 - Compression assets (images, CSS, JS)
@@ -986,9 +925,9 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 5.1.1
 - **Livrable:** Monitoring opérationnel
 
-### 5.2 Déploiement en Production (2 jours)
+### 5.2 Déploiement en Production (1.25 jours)
 
-#### 5.2.1 Migration base de données production (0.5 jour)
+#### 5.2.1 Migration base de données production (0.25 jour)
 - Application migrations EF Core
 - Seed data initial production
 - Validation intégrité données
@@ -996,7 +935,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 5.1.1, 5.1.3
 - **Livrable:** DB production initialisée
 
-#### 5.2.2 Déploiement backend API (0.5 jour)
+#### 5.2.2 Déploiement backend API (0.25 jour)
 - Build production API
 - Déploiement via CI/CD pipeline
 - Configuration CORS production
@@ -1004,7 +943,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 5.2.1, 5.1.3
 - **Livrable:** API production déployée
 
-#### 5.2.3 Déploiement frontend Blazor (0.5 jour)
+#### 5.2.3 Déploiement frontend Blazor (0.25 jour)
 - Build production Blazor
 - Déploiement via CI/CD pipeline
 - Configuration variables production
@@ -1074,7 +1013,6 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 
 #### 5.5.2 Préparation marketing (0.5 jour)
 - Page landing page
-- Annonce lancement sur réseaux sociaux
 - Email aux premiers beta testers
 - Contenu blog (optionnel)
 - **Dépendances:** 5.5.1
