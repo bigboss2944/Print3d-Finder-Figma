@@ -137,7 +137,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 1.4.3
 - **Livrable:** Document de dépendances approuvées
 
-### 1.5 Configuration de l'Environnement de Développement (1.25 jours)
+### 1.5 Configuration de l'Environnement de Développement (1.0 jours)
 
 #### 1.5.1 Setup des outils de développement (0.25 jour)
 - Configuration git et conventions
@@ -153,7 +153,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 1.4.4
 - **Livrable:** Solution .NET fonctionnelle avec structure
 
-#### 1.5.3 Configuration des environnements (0.5 jour)
+#### 1.5.3 Configuration des environnements (0.25 jour)
 - Environnements Dev, Staging, Production
 - Configuration appsettings par environnement
 - Setup base de données locale (PostgreSQL/SQL Server)
@@ -201,9 +201,9 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 2.1.1
 - **Livrable:** Pipeline HTTP sécurisé et robuste
 
-### 2.2 Authentification et Gestion Utilisateurs (7 jours)
+### 2.2 Authentification et Gestion Utilisateurs (3 jours)
 
-#### 2.2.1 Configuration ASP.NET Core Identity (1 jour - TDD)
+#### 2.2.1 Configuration ASP.NET Core Identity (0.5 jour - TDD)
 - Tests: Configuration Identity avec users
 - Implémentation: Setup Identity avec EF Core
 - Tests: Validation des contraintes
@@ -211,7 +211,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 2.1.2
 - **Livrable:** Identity configuré avec tests
 
-#### 2.2.2 Implémentation JWT (1.5 jours - TDD)
+#### 2.2.2 Implémentation JWT (0.5 jours - TDD)
 - Tests: Génération de tokens JWT
 - Implémentation: Service de génération JWT
 - Tests: Validation et expiration tokens
@@ -221,7 +221,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 2.2.1
 - **Livrable:** Authentification JWT complète avec tests
 
-#### 2.2.3 Chiffrement des noms d'utilisateurs (1 jour - TDD)
+#### 2.2.3 Chiffrement des noms d'utilisateurs (0.5 jour - TDD)
 - Tests: Chiffrement AES-256
 - Implémentation: Service de chiffrement
 - Tests: Déchiffrement et edge cases
@@ -230,20 +230,20 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 2.2.1
 - **Livrable:** Noms utilisateurs sécurisés
 
-#### 2.2.4 Endpoints d'authentification (2 jours - TDD)
-- Tests + Implémentation: POST /auth/register (0.50 jour)
-- Tests + Implémentation: POST /auth/login (0.25 jour)
-- Tests + Implémentation: POST /auth/refresh (0.25 jour)
-- Tests + Implémentation: POST /auth/logout (0.25 jour)
-- Tests + Implémentation: POST /auth/change-password (0.25 jour)
-- Tests + Implémentation: POST /auth/forgot-password (0.25 jour)
+#### 2.2.4 Endpoints d'authentification (0.5 jours - TDD)
+- Tests + Implémentation: POST /auth/register
+- Tests + Implémentation: POST /auth/login
+- Tests + Implémentation: POST /auth/refresh 
+- Tests + Implémentation: POST /auth/logout 
+- Tests + Implémentation: POST /auth/change-password
+- Tests + Implémentation: POST /auth/forgot-password 
 - **Dépendances:** 2.2.2, 2.2.3
 - **Livrable:** API auth complète avec tests 80%+
 
-#### 2.2.5 Gestion des utilisateurs (1.5 jours - TDD)
-- Tests + Implémentation: GET /users/profile (0.25 jour)
-- Tests + Implémentation: PUT /users/profile (0.25 jour)
-- Tests + Implémentation: DELETE /users/account (0.25 jour)
+#### 2.2.5 Gestion des utilisateurs (1.0 jours - TDD)
+- Tests + Implémentation: GET /users/account
+- Tests + Implémentation: PUT /users/account
+- Tests + Implémentation: DELETE /users/account
 - Tests + Implémentation: RGPD export données (0.75 jour)
 - **Dépendances:** 2.2.4
 - **Livrable:** Gestion utilisateurs conforme RGPD
@@ -774,7 +774,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** Phase 3
 - **Livrable:** Rapport performance frontend
 
-### 4.3 Tests de Sécurité (3.5 jours)
+### 4.3 Tests de Sécurité (2.5 jours)
 
 #### 4.3.1 Configuration environnement de tests sécurité (0.5 jour)
 - Installation OWASP ZAP ou Burp Suite
@@ -783,7 +783,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** Phase 2, Phase 3
 - **Livrable:** Environnement tests sécurité
 
-#### 4.3.2 Tests HTTPS et TLS (0.5 jour)
+#### 4.3.2 Tests HTTPS et TLS (0.25 jour)
 - Validation certificat SSL
 - Test HSTS (Strict-Transport-Security)
 - Test redirection HTTP → HTTPS
@@ -792,7 +792,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 4.3.1
 - **Livrable:** Rapport conformité HTTPS
 
-#### 4.3.3 Tests d'authentification (0.5 jours)
+#### 4.3.3 Tests d'authentification (0.25 jours)
 - Test force brute (rate limiting)
 - Test expiration tokens JWT
 - Test refresh tokens
@@ -802,7 +802,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 4.3.1, 2.2.4
 - **Livrable:** Rapport sécurité authentification
 
-#### 4.3.4 Tests de protection des données (0.5 jour)
+#### 4.3.4 Tests de protection des données (0.25 jour)
 - Validation chiffrement noms utilisateurs
 - Test pas de credentials dans logs
 - Test masquage emails dans logs
@@ -811,7 +811,7 @@ Ce document décompose chaque phase du projet en sous-tâches détaillées avec 
 - **Dépendances:** 4.3.3, 2.2.3
 - **Livrable:** Rapport conformité RGPD
 
-#### 4.3.5 Tests upload de fichiers (0.5 jour)
+#### 4.3.5 Tests upload de fichiers (0.25 jour)
 - Test validation formats fichiers
 - Test limites de taille (10MB/50MB)
 - Test scan antivirus (simulation malware)
