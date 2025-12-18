@@ -83,7 +83,70 @@ Ce dépôt contient la documentation complète pour le projet **Print3D Finder**
 
 ---
 
-### 3. [ARCHITECTURE_TECHNIQUE.md](./ARCHITECTURE_TECHNIQUE.md) 🏗️
+### 3. [TACHES_ET_ESTIMATIONS.md](./TACHES_ET_ESTIMATIONS.md) 📊
+**Analyse des tâches et estimations détaillées (42 KB, ~30 minutes de lecture)**
+
+#### Contenu Principal :
+
+**Vue d'Ensemble**
+- Conventions de temps (jours effectifs vs calendaires)
+- Marge de sécurité de 20% incluse
+- Adaptation au développement temps partiel (~50%)
+
+**Phase 1 - Conception et Préparation** (19 jours effectifs)
+- 1.1 Finalisation cahier des charges (3 jours)
+- 1.2 Design UI/UX avec images libres de droits (7 jours)
+- 1.3 Architecture technique détaillée (6 jours)
+- 1.4 Sélection et vérification packages (2 jours)
+- 1.5 Configuration de l'environnement de développement (1 jours)
+  
+**Phase 2 - Développement Backend** (18.5 jours effectifs)
+- 2.1 Infrastructure et configuration base (3 jours)
+- 2.2 Authentification et gestion utilisateurs (3 jours, TDD)
+- 2.3 Moteur de recherche textuelle (3 jours, TDD)
+- 2.4 Recherche par image avec IA (2 jours, TDD)
+- 2.5 Gestion des commandes (1.5 jours, TDD)
+- 2.6 Système notification email (3 jours, TDD)
+- 2.7 Tests Unitaires Backend (3 jours intégrés en TDD)
+  
+**Phase 3 - Développement Frontend Blazor** (21 jours effectifs)
+- 3.1 Setup et configuration Blazor (1 jours)
+- 3.2 Services et état application (3 jours)
+- 3.3 Pages authentification (1.5 jours)
+- 3.4 Interface de recherche (3.5 jours)
+- 3.5 Affichage résultats (3 jours)
+- 3.6 Workflow de commande (2.5 jours)
+- 3.7 Tableau de bord utilisateur (2 jours)
+- 3.8 Panneau administrateur (2.5 jours)
+- 3.9 Tests E2E frontend (2 jours)
+
+**Phase 4 - Tests et Optimisations** (14 jours effectifs)
+- 4.1 Complétion couverture tests (2.75 jours)
+- 4.2 Tests de charge et performance (5 jours)
+- 4.3 Tests de sécurité (2.5 jours)
+- 4.4 Corrections de bugs (2.25 jours)
+- 4.5 Optimisations (1.5 jours)
+
+**Phase 5 - Déploiement et Lancement** (5 jours effectifs)
+- 5.1 Configuration environnement production (3 jours)
+- 5.2 Déploiement en production (1.25 jours)
+- 5.3 Configuration CDN et performance (1 jour)
+- 5.4 Configuration emails notification (1 jour)
+- 5.5 Préparation lancement beta (2 jours)
+- 5.6 Lancement beta (1 jour)
+
+**Récapitulatif**
+- Total: 77.5 jours effectifs (15 semaines temps plein)
+- Durée calendaire: 15 semaines (3 mois temps plein)
+- 115+ sous-tâches détaillées
+- Chemin critique identifié
+- Risques et mitigation documentés
+
+**Public cible** : Chef de projet, Développeurs, Product Owner, Équipe de développement
+
+---
+
+### 4. [ARCHITECTURE_TECHNIQUE.md](./ARCHITECTURE_TECHNIQUE.md) 🏗️
 **Documentation technique détaillée (45 KB, ~30 minutes de lecture)**
 
 #### Contenu Principal :
@@ -163,13 +226,15 @@ Ce dépôt contient la documentation complète pour le projet **Print3D Finder**
 
 ### Pour les Développeurs Backend
 1. **CAHIER_DES_CHARGES.md** (Sections 2, 3) - Besoins fonctionnels et techniques
-2. **ARCHITECTURE_TECHNIQUE.md** (Sections 2.2, 2.3, 2.4) - API, données, services
-3. **ARCHITECTURE_TECHNIQUE.md** (Section 3) - Sécurité
+2. **TACHES_ET_ESTIMATIONS.md** (Phase 2) - Tâches backend détaillées avec TDD
+3. **ARCHITECTURE_TECHNIQUE.md** (Sections 2.2, 2.3, 2.4) - API, données, services
+4. **ARCHITECTURE_TECHNIQUE.md** (Section 3) - Sécurité
 
 ### Pour les Développeurs Frontend (Web - Blazor)
 1. **CAHIER_DES_CHARGES.md** (Sections 2, 5) - Fonctionnalités et UX
-2. **ARCHITECTURE_TECHNIQUE.md** (Section 2.1.1) - Structure Blazor
-3. **Code existant** dans `src/components/` - Prototype React à migrer
+2. **TACHES_ET_ESTIMATIONS.md** (Phase 3) - Tâches frontend Blazor détaillées
+3. **ARCHITECTURE_TECHNIQUE.md** (Section 2.1.1) - Structure Blazor
+4. **Code existant** dans `src/components/` - Prototype React à migrer
 
 ### Pour les Développeurs Mobile (MAUI)
 1. **CAHIER_DES_CHARGES.md** (Sections 2, 3.1.2) - Fonctionnalités mobiles
@@ -178,11 +243,13 @@ Ce dépôt contient la documentation complète pour le projet **Print3D Finder**
 
 ### Pour les DevOps
 1. **CAHIER_DES_CHARGES.md** (Sections 3.2, 4.2) - Infrastructure et performance
-2. **ARCHITECTURE_TECHNIQUE.md** (Sections 4, 5) - Déploiement et monitoring
+2. **TACHES_ET_ESTIMATIONS.md** (Phases 4 et 5) - Tests de charge, sécurité, déploiement
+3. **ARCHITECTURE_TECHNIQUE.md** (Sections 4, 5) - Déploiement et monitoring
 
 ### Pour les Product Owners / Chefs de Projet
 1. **README.md** - Vue d'ensemble
 2. **CAHIER_DES_CHARGES.md** (Sections 1, 5, 7, 8, 10) - Objectifs, workflow, planning, budget, critères
+3. **TACHES_ET_ESTIMATIONS.md** - Décomposition détaillée et estimations réalistes
 
 ### Pour les Designers UI/UX
 1. **CAHIER_DES_CHARGES.md** (Sections 2, 5) - Fonctionnalités et parcours utilisateur
