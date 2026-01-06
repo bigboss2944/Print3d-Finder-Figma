@@ -34,6 +34,7 @@ export default function App() {
     useState<Model3D | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [searchText, setSearchText] = useState("");
 
   const handleLogin = (asAdmin = false) => {
     setIsLoggedIn(true);
@@ -55,6 +56,10 @@ export default function App() {
   };
 
   const handleBackToSearch = () => {
+    setCurrentPage("search");
+  };
+
+  const handleGoToSearch = () => {
     setCurrentPage("search");
   };
 
@@ -89,6 +94,8 @@ export default function App() {
             onLogout={handleLogout}
             onGoToProfile={handleGoToProfile}
             onGoToAdmin={isAdmin ? handleGoToAdmin : undefined}
+            searchText={searchText}
+            onSearchTextChange={setSearchText}
           />
         )}
         {currentPage === "results" && (
@@ -98,6 +105,10 @@ export default function App() {
             onLogout={handleLogout}
             onGoToProfile={handleGoToProfile}
             onGoToAdmin={isAdmin ? handleGoToAdmin : undefined}
+            onGoToSearch={handleGoToSearch}
+            searchText={searchText}
+            onSearchTextChange={setSearchText}
+            onSearchSubmit={handleSearch}
           />
         )}
         {currentPage === "details" && selectedModel && (
@@ -108,6 +119,10 @@ export default function App() {
             onLogout={handleLogout}
             onGoToProfile={handleGoToProfile}
             onGoToAdmin={isAdmin ? handleGoToAdmin : undefined}
+            onGoToSearch={handleGoToSearch}
+            searchText={searchText}
+            onSearchTextChange={setSearchText}
+            onSearchSubmit={handleSearch}
           />
         )}
         {currentPage === "request" && selectedModel && (
@@ -117,18 +132,30 @@ export default function App() {
             onLogout={handleLogout}
             onGoToProfile={handleGoToProfile}
             onGoToAdmin={isAdmin ? handleGoToAdmin : undefined}
+            onGoToSearch={handleGoToSearch}
+            searchText={searchText}
+            onSearchTextChange={setSearchText}
+            onSearchSubmit={handleSearch}
           />
         )}
         {currentPage === "profile" && (
           <UserProfile
             onBack={handleBackToSearch}
             onLogout={handleLogout}
+            onGoToSearch={handleGoToSearch}
+            searchText={searchText}
+            onSearchTextChange={setSearchText}
+            onSearchSubmit={handleSearch}
           />
         )}
         {currentPage === "admin" && (
           <AdminDashboard
             onBack={handleBackToSearch}
             onLogout={handleLogout}
+            onGoToSearch={handleGoToSearch}
+            searchText={searchText}
+            onSearchTextChange={setSearchText}
+            onSearchSubmit={handleSearch}
           />
         )}
       </div>

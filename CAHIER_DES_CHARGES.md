@@ -853,7 +853,6 @@ Les messages d'erreur doivent être **suffisamment explicites** pour guider l'ut
 6. **Configuration de l'Impression**
    - Sélection du matériau (PLA, ABS, PETG...)
    - Choix de la couleur
-   - Réglage de la qualité d'impression
    - Options additionnelles (remplissage, post-traitement)
 
 7. **Validation et Commande**

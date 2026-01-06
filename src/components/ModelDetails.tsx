@@ -23,6 +23,10 @@ interface ModelDetailsProps {
   onLogout: () => void;
   onGoToProfile?: () => void;
   onGoToAdmin?: () => void;
+  onGoToSearch?: () => void;
+  searchText: string;
+  onSearchTextChange: (text: string) => void;
+  onSearchSubmit: () => void;
 }
 
 export function ModelDetails({
@@ -32,6 +36,10 @@ export function ModelDetails({
   onLogout,
   onGoToProfile,
   onGoToAdmin,
+  onGoToSearch,
+  searchText,
+  onSearchTextChange,
+  onSearchSubmit,
 }: ModelDetailsProps) {
   const [isDescriptionModalOpen, setIsDescriptionModalOpen] = useState(false);
   
@@ -71,20 +79,24 @@ export function ModelDetails({
       <header className="bg-white/90 backdrop-blur-sm shadow-sm sticky top-0 z-10">{/* Added backdrop-blur-sm and changed to bg-white/90 */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <button
-              onClick={onBack}
-              className="flex items-center gap-2 px-3 sm:px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span className="hidden sm:inline">
-                Retour aux résultats
-              </span>
-              <span className="sm:hidden">Retour</span>
-            </button>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
+                <Package className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+              <h1 className="text-gray-900 text-lg sm:text-xl">
+                Print3D Finder
+              </h1>
+            </div>
             <Navigation
               onLogout={onLogout}
               onGoToProfile={onGoToProfile}
               onGoToAdmin={onGoToAdmin}
+              onGoToSearch={onGoToSearch}
+              showSearchBar={true}
+              searchText={searchText}
+              onSearchTextChange={onSearchTextChange}
+              onSearchSubmit={onSearchSubmit}
+              currentPage="details"
             />
           </div>
         </div>

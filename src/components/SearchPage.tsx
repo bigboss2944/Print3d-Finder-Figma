@@ -12,6 +12,8 @@ interface SearchPageProps {
   onLogout: () => void;
   onGoToProfile?: () => void;
   onGoToAdmin?: () => void;
+  searchText: string;
+  onSearchTextChange: (text: string) => void;
 }
 
 export function SearchPage({
@@ -19,8 +21,9 @@ export function SearchPage({
   onLogout,
   onGoToProfile,
   onGoToAdmin,
+  searchText,
+  onSearchTextChange,
 }: SearchPageProps) {
-  const [searchText, setSearchText] = useState("");
   const [searchMode, setSearchMode] = useState<
     "text" | "image"
   >("text");
@@ -59,6 +62,11 @@ export function SearchPage({
             onLogout={onLogout}
             onGoToProfile={onGoToProfile}
             onGoToAdmin={onGoToAdmin}
+            showSearchBar={true}
+            searchText={searchText}
+            onSearchTextChange={onSearchTextChange}
+            onSearchSubmit={onSearch}
+            currentPage="search"
           />
         </div>
       </header>
@@ -101,31 +109,9 @@ export function SearchPage({
           </div>
 
           {searchMode === "text" ? (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                onSearch();
-              }}
-            >
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  value={searchText}
-                  onChange={(e) =>
-                    setSearchText(e.target.value)
-                  }
-                  placeholder="Ex: vase moderne, figurine dragon, support casque..."
-                  className="w-full pl-12 pr-4 py-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
-              <button
-                type="submit"
-                className="w-full mt-4 bg-indigo-600 text-white py-4 rounded-xl hover:bg-indigo-700 transition-colors"
-              >
-                Rechercher
-              </button>
-            </form>
+            <div className="text-center text-gray-600">
+              <p>Utilisez la barre de recherche en haut pour rechercher un modèle</p>
+            </div>
           ) : (
             <div className="space-y-4">
               <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-indigo-400 hover:bg-indigo-50 transition-colors cursor-pointer">
@@ -164,7 +150,7 @@ export function SearchPage({
               <button
                 key={search}
                 onClick={() => {
-                  setSearchText(search);
+                  onSearchTextChange(search);
                   setSearchMode("text");
                 }}
                 className="px-4 py-2 bg-white rounded-full text-gray-700 hover:bg-indigo-100 hover:text-indigo-700 transition-colors shadow-sm"
