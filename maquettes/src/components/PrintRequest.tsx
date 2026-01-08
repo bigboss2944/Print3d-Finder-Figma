@@ -136,6 +136,7 @@ export function PrintRequest({
               onGoToProfile={onGoToProfile}
               onGoToAdmin={onGoToAdmin}
               onGoToSearch={onGoToSearch}
+              onBack={onBack}
               showSearchBar={true}
               searchText={searchText}
               onSearchTextChange={onSearchTextChange}

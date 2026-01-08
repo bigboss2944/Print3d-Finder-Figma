@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "iRHTHaXUBSM=",
+  "success": true,
+  "projectFilePath": "/home/fabrice/source/Projets/C#/Print3d-Finder-Figma/src/Print3DFinder.Shared/Print3DFinder.Shared.csproj",
+  "expectedPackageFiles": [
+    "/home/fabrice/.nuget/packages/fluentvalidation/11.9.0/fluentvalidation.11.9.0.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -1,0 +1,6 @@
+@Print3DFinder.Api_HostAddress = http://localhost:5056
+
+GET {{Print3DFinder.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

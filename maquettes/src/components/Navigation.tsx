@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Menu, X, User, LayoutDashboard, LogOut, Search } from 'lucide-react';
+import { Menu, X, User, LayoutDashboard, LogOut, Search, ArrowLeft } from 'lucide-react';
 
 interface NavigationProps {
   onLogout: () => void;
   onGoToProfile?: () => void;
   onGoToAdmin?: () => void;
   onGoToSearch?: () => void;
+  onBack?: () => void;
   currentPage?: string;
   showSearchBar?: boolean;
   searchText?: string;
@@ -13,13 +14,22 @@ interface NavigationProps {
   onSearchSubmit?: () => void;
 }
 
-export function Navigation({ onLogout, onGoToProfile, onGoToAdmin, onGoToSearch, currentPage, showSearchBar, searchText, onSearchTextChange, onSearchSubmit }: NavigationProps) {
+export function Navigation({ onLogout, onGoToProfile, onGoToAdmin, onGoToSearch, onBack, currentPage, showSearchBar, searchText, onSearchTextChange, onSearchSubmit }: NavigationProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <>
       {/* Desktop Navigation */}
       <div className="hidden md:flex items-center gap-2">
+        {onBack && (currentPage === 'details' || currentPage === 'request') && (
+          <button
+            onClick={onBack}
+            className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span>Précédent</span>
+          </button>
+        )}
         {showSearchBar && (
           <form 
             onSubmit={(e) => {
@@ -93,6 +103,18 @@ export function Navigation({ onLogout, onGoToProfile, onGoToAdmin, onGoToSearch,
 
         {isMenuOpen && (
           <div className="absolute top-16 right-4 bg-white rounded-xl shadow-xl border border-gray-200 py-2 min-w-[200px] z-50">
+            {onBack && (currentPage === 'details' || currentPage === 'request') && (
+              <button
+                onClick={() => {
+                  onBack();
+                  setIsMenuOpen(false);
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+                <span>Précédent</span>
+              </button>
+            )}
             {onGoToSearch && currentPage !== 'search' && (
               <button
                 onClick={() => {

@@ -67,6 +67,10 @@ export default function App() {
     setCurrentPage("results");
   };
 
+  const handleBackToDetails = () => {
+    setCurrentPage("details");
+  };
+
   const handleGoToProfile = () => {
     setCurrentPage("profile");
   };
@@ -128,7 +132,7 @@ export default function App() {
         {currentPage === "request" && selectedModel && (
           <PrintRequest
             model={selectedModel}
-            onBack={handleBackToSearch}
+            onBack={handleBackToDetails}
             onLogout={handleLogout}
             onGoToProfile={handleGoToProfile}
             onGoToAdmin={isAdmin ? handleGoToAdmin : undefined}
